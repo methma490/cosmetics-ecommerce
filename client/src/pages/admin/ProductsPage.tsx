@@ -131,7 +131,7 @@ export const ProductsPage: React.FC = () => {
 
         <Link
           to="/admin/products/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#C85C7A] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#A84462] transition-colors shadow-xs"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs"
         >
           <Plus className="w-4 h-4" />
           <span>Add Formulation</span>
@@ -139,14 +139,14 @@ export const ProductsPage: React.FC = () => {
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="bg-white rounded-2xl border border-[#E8DADD] p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-2xs">
+      <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-4 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-2xs">
         <div className="relative w-full sm:w-72">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title or brand..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#E8DADD] text-xs text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
           />
           <Search className="w-4 h-4 text-[#756D70] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
@@ -155,7 +155,7 @@ export const ProductsPage: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full sm:w-48 px-3 py-2 rounded-xl border border-[#E8DADD] text-xs text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+            className="w-full sm:w-48 px-3 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
           >
             <option value="">All Categories</option>
             {categories.map((c) => (
@@ -175,11 +175,11 @@ export const ProductsPage: React.FC = () => {
       {loading ? (
         <Loader text="Loading catalog..." />
       ) : filteredProducts.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] p-12 text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center mx-auto">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-12 text-center space-y-4 shadow-2xs">
+          <div className="w-14 h-14 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
             <Package className="w-7 h-7" />
           </div>
-          <h3 className="font-serif-luxury text-lg text-[#252223]">
+          <h3 className="font-serif-luxury text-lg text-[#211A1C]">
             No products found
           </h3>
           <p className="text-xs text-[#756D70]">
@@ -187,10 +187,10 @@ export const ProductsPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] overflow-hidden shadow-xs">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF8F3] border-b border-[#E8DADD] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#FFF9F5] border-b border-[#F0DFD8] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-4">Product</th>
                   <th className="py-3.5 px-4">Category</th>
@@ -200,7 +200,7 @@ export const ProductsPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8DADD]/40">
+              <tbody className="divide-y divide-[#F0DFD8]">
                 {filteredProducts.map((p) => {
                   const catName =
                     typeof p.category === "object" && p.category !== null
@@ -212,7 +212,7 @@ export const ProductsPage: React.FC = () => {
                     "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100&q=80";
 
                   return (
-                    <tr key={p._id} className="hover:bg-[#FBECEF]/20 transition-colors">
+                    <tr key={p._id} className="hover:bg-[#FFF9F5]/70 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <img

@@ -9,7 +9,7 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <AdminRoute>
-      <div className="min-h-screen flex bg-[#FAF8F3] text-[#252223]">
+      <div className="min-h-screen flex bg-[#FFF9F5] text-[#211A1C]">
         <AdminSidebar
           mobileOpen={mobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}

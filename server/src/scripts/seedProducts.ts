@@ -1,4 +1,4 @@
-/*import "dotenv/config";
+import "dotenv/config";
 import mongoose from "mongoose";
 
 import connectDB from "../config/db.js";
@@ -243,4 +243,3 @@ const seedProducts = async (): Promise<void> => {
 };
 
 void seedProducts();
-*/

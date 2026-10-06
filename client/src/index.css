@@ -1,15 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-bg: #FAF8F3;
-  --color-brand-surface: #FFFFFF;
-  --color-brand-primary: #C85C7A;
-  --color-brand-primary-hover: #A84462;
-  --color-brand-accent-light: #F3D6DE;
-  --color-brand-accent-subtle: #FBECEF;
-  --color-brand-text: #252223;
-  --color-brand-text-muted: #756D70;
-  --color-brand-border: #E8DADD;
+  --color-brand-bg: #FFF9F5;
+  --color-brand-surface: #FFFCFA;
+  --color-brand-primary: #B87D4B;
+  --color-brand-primary-hover: #9E6536;
+  --color-brand-primary-light: #F7EFE9;
+  --color-brand-pink: #B87D4B;
+  --color-brand-rose: #B87D4B;
+  --color-brand-blush: #F7EFE9;
+  --color-brand-gold: #D4AF37;
+  --color-brand-gold-bright: #FFF1A8;
+  --color-brand-gold-deep: #8F6B00;
+  --color-brand-dark: #211A1C;
+  --color-brand-text: #211A1C;
+  --color-brand-text-muted: #7D7275;
+  --color-brand-border: #EFE6DF;
   --color-brand-success: #56805D;
   --color-brand-error: #B33A3A;
 
@@ -18,15 +24,20 @@
 }
 
 :root {
-  --bg-main: #FAF8F3;
-  --surface: #FFFFFF;
-  --primary: #C85C7A;
-  --primary-hover: #A84462;
-  --accent-light: #F3D6DE;
-  --accent-subtle: #FBECEF;
-  --text-main: #252223;
-  --text-muted: #756D70;
-  --border-pink: #E8DADD;
+  --bg-cream: #FFF9F5;
+  --surface-pearl: #FFFCFA;
+  --color-primary: #B87D4B;
+  --color-primary-hover: #9E6536;
+  --color-primary-light: #F7EFE9;
+  --pink-luxury: #B87D4B;
+  --pink-rose: #B87D4B;
+  --pink-blush: #F7EFE9;
+  --gold-metallic: #D4AF37;
+  --gold-bright: #FFF1A8;
+  --gold-deep: #8F6B00;
+  --dark-main: #211A1C;
+  --text-muted: #7D7275;
+  --border-subtle: #EFE6DF;
   --success: #56805D;
   --error: #B33A3A;
 }
@@ -34,15 +45,15 @@
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
-  background-color: #FAF8F3;
-  color: #252223;
+  background-color: #FFF9F5;
+  color: #211A1C;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #FAF8F3;
-  color: #252223;
+  background-color: #FFF9F5;
+  color: #211A1C;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -55,7 +66,7 @@ body {
   width: 100%;
 }
 
-/* Luxury typography utilities */
+/* Luxury Typography Utilities */
 .font-serif-luxury {
   font-family: 'Playfair Display', Georgia, serif;
 }
@@ -64,9 +75,78 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+/* Metallic Gold Gradients */
+.bg-gold-metallic {
+  background: linear-gradient(
+    120deg,
+    #8F6B00 0%,
+    #CFAF32 20%,
+    #FFF1A8 42%,
+    #D4AF37 58%,
+    #FFF4B0 72%,
+    #A67C00 100%
+  );
+}
+
+.text-gold-metallic {
+  background: linear-gradient(
+    120deg,
+    #8F6B00 0%,
+    #CFAF32 20%,
+    #FFF1A8 42%,
+    #D4AF37 58%,
+    #FFF4B0 72%,
+    #A67C00 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.border-gold-metallic {
+  border-color: #D4AF37;
+  border-image: linear-gradient(
+    120deg,
+    #8F6B00 0%,
+    #CFAF32 20%,
+    #FFF1A8 42%,
+    #D4AF37 58%,
+    #FFF4B0 72%,
+    #A67C00 100%
+  ) 1;
+}
+
+.gold-glow {
+  box-shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.28);
+}
+
+.pink-glow {
+  box-shadow: 0 8px 25px -4px rgba(217, 108, 133, 0.32);
+}
+
+.pearl-card {
+  background-color: #FFFCFA;
+  border: 1px solid #F0DFD8;
+  box-shadow: 0 4px 20px -4px rgba(33, 26, 28, 0.04);
+}
+
+/* Metallic Sheen Animation */
+@keyframes metallicShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-gold-shine {
+  background-size: 200% auto;
+  animation: metallicShine 4s linear infinite;
+}
+
 /* Custom smooth transitions */
 .transition-smooth {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Custom scrollbar for drawers and modals */
@@ -76,16 +156,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF8F3;
+  background: #FFF9F5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E8DADD;
+  background: #EAD5CE;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C85C7A;
+  background: #B87D4B;
 }
 
 /* Reduced motion preference */

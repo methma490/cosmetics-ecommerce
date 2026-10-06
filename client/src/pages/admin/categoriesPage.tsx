@@ -126,9 +126,12 @@ export const CategoriesPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8DADD]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#F0DFD8]">
         <div>
-          <h1 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#252223]">
+          <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-gold-metallic block">
+            Taxonomy Management
+          </span>
+          <h1 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#211A1C]">
             Product Categories
           </h1>
           <p className="text-xs text-[#756D70] mt-1">
@@ -139,7 +142,7 @@ export const CategoriesPage: React.FC = () => {
         <button
           type="button"
           onClick={openAddModal}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#C85C7A] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#A84462] transition-colors shadow-xs cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add Category</span>
@@ -150,11 +153,11 @@ export const CategoriesPage: React.FC = () => {
       {loading ? (
         <Loader text="Loading categories..." />
       ) : categories.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] p-12 text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center mx-auto">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-12 text-center space-y-4 shadow-2xs">
+          <div className="w-14 h-14 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
             <Layers className="w-7 h-7" />
           </div>
-          <h3 className="font-serif-luxury text-lg text-[#252223]">
+          <h3 className="font-serif-luxury text-lg text-[#211A1C]">
             No categories yet
           </h3>
           <p className="text-xs text-[#756D70]">
@@ -162,10 +165,10 @@ export const CategoriesPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] overflow-hidden shadow-xs">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF8F3] border-b border-[#E8DADD] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#FFF9F5] border-b border-[#F0DFD8] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-4">Category Name</th>
                   <th className="py-3.5 px-4">Slug</th>
@@ -174,10 +177,10 @@ export const CategoriesPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8DADD]/40">
+              <tbody className="divide-y divide-[#F0DFD8]">
                 {categories.map((cat) => (
-                  <tr key={cat._id} className="hover:bg-[#FBECEF]/20 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-[#252223]">
+                  <tr key={cat._id} className="hover:bg-[#FFF9F5]/70 transition-colors">
+                    <td className="py-3.5 px-4 font-semibold text-[#211A1C]">
                       {cat.name}
                     </td>
 
@@ -206,7 +209,7 @@ export const CategoriesPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => openEditModal(cat)}
-                          className="p-1.5 text-[#756D70] hover:text-[#C85C7A]"
+                          className="p-1.5 text-[#756D70] hover:text-[#B87D4B] cursor-pointer"
                           title="Edit category"
                         >
                           <Edit className="w-4 h-4" />

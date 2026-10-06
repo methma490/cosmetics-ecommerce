@@ -102,31 +102,33 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
   if (statusType === "cancel") {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
-          <XCircle className="w-9 h-9" />
-        </div>
-        <span className="text-xs uppercase tracking-widest text-[#B33A3A] font-semibold">
-          Payment Cancelled
-        </span>
-        <h1 className="font-serif-luxury text-3xl font-normal text-[#252223]">
-          Payment Was Not Completed
-        </h1>
-        <p className="text-xs text-[#756D70] max-w-md mx-auto leading-relaxed">
-          The transaction for order <strong className="text-[#252223] font-mono">{orderId}</strong> was cancelled. Your items remain safe and your card has not been charged.
-        </p>
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/cart"
-            className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#C85C7A] text-white text-xs font-semibold hover:bg-[#A84462] transition-colors shadow-xs"
-          >
-            Review Shopping Bag
-          </Link>
-          <Link
-            to="/shop"
-            className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#E8DADD] text-xs font-medium text-[#252223] hover:bg-[#FAF8F3] transition-colors"
-          >
-            Continue Shopping
-          </Link>
+        <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-8 sm:p-12 shadow-[0_10px_35px_-10px_rgba(217,108,133,0.12)] space-y-6 relative overflow-hidden">
+          <div className="w-16 h-16 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
+            <XCircle className="w-9 h-9" />
+          </div>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-[#B33A3A] font-bold block">
+            Payment Cancelled
+          </span>
+          <h1 className="font-serif-luxury text-3xl font-normal text-[#211A1C]">
+            Payment Was Not Completed
+          </h1>
+          <p className="text-xs text-[#756D70] max-w-md mx-auto leading-relaxed">
+            The transaction for order <strong className="text-[#211A1C] font-mono">{orderId}</strong> was cancelled. Your items remain safe in your bag and your card has not been charged.
+          </p>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/cart"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold transition-all shadow-xs"
+            >
+              Review Shopping Bag
+            </Link>
+            <Link
+              to="/shop"
+              className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#D4AF37]/40 text-xs font-medium text-[#211A1C] hover:bg-[#FFF9F5] transition-colors"
+            >
+              Continue Shopping
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -136,11 +138,12 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
   return (
     <div className="max-w-xl mx-auto px-4 py-16 space-y-8">
       {loading ? (
-        <div className="bg-white rounded-3xl border border-[#E8DADD] p-10 text-center space-y-4 shadow-xs">
-          <div className="w-16 h-16 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center mx-auto">
+        <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-10 text-center space-y-4 shadow-xs relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#D4AF37]" />
+          <div className="w-16 h-16 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
-          <h2 className="font-serif-luxury text-2xl text-[#252223]">
+          <h2 className="font-serif-luxury text-2xl text-[#211A1C]">
             Verifying Signature with PayHere...
           </h2>
           <p className="text-xs text-[#756D70] max-w-sm mx-auto leading-relaxed">
@@ -151,27 +154,29 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
           </span>
         </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-[#E8DADD] p-8 sm:p-12 text-center space-y-6 shadow-xs">
+        <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-8 sm:p-12 text-center space-y-6 shadow-[0_10px_35px_-10px_rgba(217,108,133,0.12)] relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gold-metallic" />
+
           <div className="w-16 h-16 rounded-full bg-[#56805D]/10 text-[#56805D] flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-9 h-9" />
           </div>
 
           <div>
-            <span className="text-xs uppercase tracking-widest text-[#56805D] font-semibold">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-gold-metallic font-bold block">
               Payment Verified Authoritatively
             </span>
-            <h1 className="font-serif-luxury text-3xl font-normal text-[#252223] mt-1">
+            <h1 className="font-serif-luxury text-3xl font-normal text-[#211A1C] mt-1">
               Payment Successful!
             </h1>
           </div>
 
           <p className="text-xs text-[#756D70] max-w-md mx-auto leading-relaxed">
-            Your payment for order <strong className="font-mono text-[#252223]">{paymentData?.orderNumber || orderId}</strong> has been verified by the backend.
+            Your payment for order <strong className="font-mono text-[#211A1C]">{paymentData?.orderNumber || orderId}</strong> has been verified by the backend.
           </p>
 
           {/* Quick status card */}
           {paymentData && (
-            <div className="p-4 rounded-2xl bg-[#FAF8F3] border border-[#E8DADD] text-xs space-y-2 text-left">
+            <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-gold-metallic/30 text-xs space-y-2 text-left shadow-2xs">
               <div className="flex justify-between">
                 <span className="text-[#756D70]">Payment Status:</span>
                 <span className="font-bold text-[#56805D] capitalize">
@@ -180,13 +185,13 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-[#756D70]">Order Status:</span>
-                <span className="font-bold text-[#252223] capitalize">
+                <span className="font-bold text-[#211A1C] capitalize">
                   {paymentData.orderStatus}
                 </span>
               </div>
-              <div className="flex justify-between border-t border-[#E8DADD]/60 pt-2 font-semibold">
+              <div className="flex justify-between border-t border-[#F0DFD8] pt-2 font-semibold">
                 <span>Total Amount:</span>
-                <span className="text-[#C85C7A]">{formatPrice(paymentData.total)}</span>
+                <span className="text-[#B87D4B]">{formatPrice(paymentData.total)}</span>
               </div>
             </div>
           )}
@@ -195,13 +200,13 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
             <button
               type="button"
               onClick={() => navigate(`/account`)}
-              className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#C85C7A] text-white text-xs font-semibold hover:bg-[#A84462] transition-colors shadow-xs"
+              className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
             >
               View in My Orders
             </button>
             <Link
               to="/shop"
-              className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#E8DADD] text-xs font-medium text-[#252223] hover:bg-[#FAF8F3] transition-colors"
+              className="w-full sm:w-auto px-6 py-3 rounded-full border border-gold-metallic/40 text-xs font-medium text-[#211A1C] hover:bg-[#FFF9F5] transition-colors"
             >
               Continue Shopping
             </Link>

@@ -85,9 +85,25 @@ export const getProducts = async (
       typeof search === "string" &&
       search.trim()
     ) {
-      filter.$text = {
-        $search: search.trim(),
-      };
+      const trimmedSearch = search.trim();
+      const escaped = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const terms = trimmedSearch
+        .split(/\s+/)
+        .filter((w) => w.length > 1)
+        .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+
+      const searchConditions: Record<string, unknown>[] = [
+        { name: { $regex: escaped, $options: "i" } },
+        { brand: { $regex: escaped, $options: "i" } },
+        { description: { $regex: escaped, $options: "i" } },
+      ];
+
+      terms.forEach((t) => {
+        searchConditions.push({ name: { $regex: t, $options: "i" } });
+        searchConditions.push({ description: { $regex: t, $options: "i" } });
+      });
+
+      filter.$or = searchConditions;
     }
 
     /*

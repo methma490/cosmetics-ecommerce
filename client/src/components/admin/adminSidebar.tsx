@@ -56,20 +56,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   const content = (
-    <div className="h-full flex flex-col justify-between p-4 bg-white border-r border-[#E8DADD]">
+    <div className="h-full flex flex-col justify-between p-4 bg-[#FFFCFA] border-r border-[#F0DFD8]">
       <div>
         {/* Brand header */}
-        <div className="flex items-center justify-between px-3 py-4 border-b border-[#E8DADD]/60 mb-6">
+        <div className="flex items-center justify-between px-3 py-4 border-b border-[#F0DFD8] mb-6">
           <Link to="/admin" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center font-bold font-serif-luxury">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F7EFE9] to-[#E8DDD4] text-[#B87D4B] border border-[#D4AF37]/30 flex items-center justify-center font-bold font-serif-luxury shadow-2xs">
               A
             </div>
             <div>
-              <span className="font-serif-luxury text-base font-semibold tracking-wider text-[#252223] block leading-none">
+              <span className="font-serif-luxury text-base font-semibold tracking-wider text-[#211A1C] block leading-none">
                 AURA
               </span>
-              <span className="text-[9px] uppercase tracking-widest text-[#C85C7A] font-semibold">
-                Admin Panel
+              <span className="text-[9px] uppercase tracking-widest text-[#B87D4B] font-bold">
+                L’Étoile Atelier
               </span>
             </div>
           </Link>
@@ -77,7 +77,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <button
               type="button"
               onClick={() => setMobileOpen(false)}
-              className="lg:hidden p-1 text-[#756D70] hover:text-[#252223]"
+              className="lg:hidden p-1 text-[#756D70] hover:text-[#211A1C] cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -96,11 +96,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 onClick={() => setMobileOpen && setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                   active
-                    ? "bg-[#C85C7A] text-white shadow-xs font-semibold"
-                    : "text-[#756D70] hover:bg-[#FBECEF] hover:text-[#252223]"
+                    ? "bg-[#B87D4B] text-white shadow-xs font-semibold"
+                    : "text-[#756D70] hover:bg-[#F7EFE9] hover:text-[#211A1C]"
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? "text-white" : "text-[#C85C7A]"}`} />
+                <Icon className={`w-4 h-4 ${active ? "text-white" : "text-[#B87D4B]"}`} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -109,14 +109,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </div>
 
       {/* Bottom Switcher */}
-      <div className="pt-4 border-t border-[#E8DADD]/60 space-y-2">
+      <div className="pt-4 border-t border-[#F0DFD8] space-y-2">
         <Link
           to="/"
-          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#252223] hover:bg-[#FAF8F3] transition-colors border border-[#E8DADD]"
+          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#211A1C] hover:bg-[#FFF9F5] transition-colors border border-gold-metallic/30 shadow-2xs"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#C85C7A]" />
-            <span>Storefront</span>
+            <Sparkles className="w-4 h-4 text-gold-metallic" />
+            <span className="font-medium">Storefront</span>
           </div>
           <ExternalLink className="w-3.5 h-3.5 text-[#756D70]" />
         </Link>

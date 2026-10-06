@@ -176,9 +176,12 @@ export const OrdersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="pb-4 border-b border-[#E8DADD] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="pb-4 border-b border-[#F0DFD8] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#252223]">
+          <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-gold-metallic block">
+            Fulfillment Center
+          </span>
+          <h1 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#211A1C]">
             Customer Orders
           </h1>
           <p className="text-xs text-[#756D70] mt-1">
@@ -188,13 +191,13 @@ export const OrdersPage: React.FC = () => {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white rounded-2xl border border-[#E8DADD] p-4 flex flex-wrap gap-4 items-center justify-between shadow-2xs">
+      <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-4 flex flex-wrap gap-4 items-center justify-between shadow-2xs">
         <div className="flex flex-wrap items-center gap-3">
           {/* Order Status */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-[#E8DADD] text-xs text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+            className="px-3 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
           >
             <option value="">All Order Statuses</option>
             <option value="pending">Pending</option>
@@ -209,7 +212,7 @@ export const OrdersPage: React.FC = () => {
           <select
             value={paymentStatusFilter}
             onChange={(e) => setPaymentStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-[#E8DADD] text-xs text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+            className="px-3 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
           >
             <option value="">All Payment Statuses</option>
             <option value="pending">Pending</option>
@@ -222,7 +225,7 @@ export const OrdersPage: React.FC = () => {
           <select
             value={paymentMethodFilter}
             onChange={(e) => setPaymentMethodFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-[#E8DADD] text-xs text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+            className="px-3 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
           >
             <option value="">All Methods</option>
             <option value="payhere">PayHere</option>
@@ -231,7 +234,7 @@ export const OrdersPage: React.FC = () => {
         </div>
 
         <span className="text-xs text-[#756D70]">
-          Total: <strong className="text-[#252223]">{orders.length}</strong> orders
+          Total: <strong className="text-[#211A1C]">{orders.length}</strong> orders
         </span>
       </div>
 
@@ -239,11 +242,11 @@ export const OrdersPage: React.FC = () => {
       {loading ? (
         <Loader text="Loading orders..." />
       ) : orders.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] p-12 text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center mx-auto">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-12 text-center space-y-4 shadow-2xs">
+          <div className="w-14 h-14 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
             <ShoppingBag className="w-7 h-7" />
           </div>
-          <h3 className="font-serif-luxury text-lg text-[#252223]">
+          <h3 className="font-serif-luxury text-lg text-[#211A1C]">
             No orders found
           </h3>
           <p className="text-xs text-[#756D70]">
@@ -251,10 +254,10 @@ export const OrdersPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#E8DADD] overflow-hidden shadow-xs">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] overflow-hidden shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF8F3] border-b border-[#E8DADD] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#FFF9F5] border-b border-[#F0DFD8] text-[#756D70] font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-4">Order #</th>
                   <th className="py-3.5 px-4">Customer</th>
@@ -266,7 +269,7 @@ export const OrdersPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Inspect</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E8DADD]/40">
+              <tbody className="divide-y divide-[#F0DFD8]">
                 {orders.map((o) => {
                   const dateStr = new Date(o.createdAt).toLocaleDateString(
                     "en-US",
@@ -278,7 +281,7 @@ export const OrdersPage: React.FC = () => {
                   );
 
                   return (
-                    <tr key={o._id} className="hover:bg-[#FBECEF]/20 transition-colors">
+                    <tr key={o._id} className="hover:bg-[#FFF9F5]/70 transition-colors">
                       <td className="py-3.5 px-4 font-mono font-bold text-[#252223]">
                         {o.orderNumber}
                       </td>

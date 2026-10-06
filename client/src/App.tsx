@@ -45,17 +45,17 @@ const App: React.FC = () => {
             toastOptions={{
               duration: 3500,
               style: {
-                background: '#FFFFFF',
-                color: '#252223',
-                border: '1px solid #E8DADD',
-                borderRadius: '14px',
+                background: '#FFFCFA',
+                color: '#211A1C',
+                border: '1px solid #F0DFD8',
+                borderRadius: '16px',
                 fontSize: '13px',
-                boxShadow: '0 8px 24px -4px rgba(200, 92, 122, 0.12)',
-                padding: '12px 16px',
+                boxShadow: '0 12px 32px -4px rgba(184, 125, 75, 0.15)',
+                padding: '12px 18px',
               },
               success: {
                 iconTheme: {
-                  primary: '#C85C7A',
+                  primary: '#B87D4B',
                   secondary: '#FFFFFF',
                 },
               },
@@ -75,7 +75,14 @@ const App: React.FC = () => {
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route
+                path="/checkout"
+                element={
+                  <ProtectedRoute>
+                    <CheckoutPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               

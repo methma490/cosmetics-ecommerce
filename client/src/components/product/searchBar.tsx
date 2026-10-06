@@ -8,11 +8,13 @@ import { formatPrice } from "../../utils/formatPrice";
 interface SearchBarProps {
   onClose?: () => void;
   autoFocus?: boolean;
+  onSelectResult?: () => void;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   onClose,
   autoFocus = false,
+  onSelectResult,
 }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Product[]>([]);
@@ -67,6 +69,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     if (!query.trim()) return;
     setIsOpen(false);
     if (onClose) onClose();
+    if (onSelectResult) onSelectResult();
     navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
   };
 
@@ -79,7 +82,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search serums, lipsticks, fragrances..."
           autoFocus={autoFocus}
-          className="w-full pl-10 pr-10 py-2.5 rounded-full border border-[#E8DADD] bg-white text-xs sm:text-sm text-[#252223] placeholder:text-[#756D70] focus:outline-hidden focus:border-[#C85C7A] focus:ring-2 focus:ring-[#F3D6DE]/50 transition-all shadow-xs"
+          className="w-full pl-10 pr-10 py-2.5 rounded-full border border-[#F0DFD8] bg-white text-xs sm:text-sm text-[#211A1C] placeholder:text-[#756D70] focus:outline-hidden focus:border-[#B87D4B] focus:ring-2 focus:ring-[#B87D4B]/20 transition-all shadow-xs"
         />
         <Search className="w-4 h-4 text-[#756D70] absolute left-3.5 pointer-events-none" />
 
@@ -91,7 +94,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               setResults([]);
               setIsOpen(false);
             }}
-            className="absolute right-3 p-1 text-[#756D70] hover:text-[#252223]"
+            className="absolute right-3 p-1 text-[#756D70] hover:text-[#211A1C] cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -100,15 +103,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Live Results Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#E8DADD] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-[#FFFCFA] rounded-2xl shadow-xl border border-[#F0DFD8] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {loading ? (
             <div className="p-6 flex items-center justify-center gap-2 text-xs text-[#756D70]">
-              <Loader2 className="w-4 h-4 animate-spin text-[#C85C7A]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#B87D4B]" />
               <span>Searching formulations...</span>
             </div>
           ) : results.length > 0 ? (
-            <div className="divide-y divide-[#E8DADD]/40">
-              <div className="px-4 py-2 bg-[#FAF8F3] text-[11px] font-semibold tracking-wider text-[#756D70] uppercase">
+            <div className="divide-y divide-[#F0DFD8]">
+              <div className="px-4 py-2 bg-[#FFF9F5] text-[10px] font-bold tracking-[0.2em] text-[#B87D4B] uppercase">
                 Products ({results.length})
               </div>
               {results.map((product) => {
@@ -122,30 +125,31 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     onClick={() => {
                       setIsOpen(false);
                       if (onClose) onClose();
+                      if (onSelectResult) onSelectResult();
                     }}
-                    className="flex items-center gap-3 p-3 hover:bg-[#FBECEF]/40 transition-colors"
+                    className="flex items-center gap-3 p-3 hover:bg-[#FFF9F5] transition-colors"
                   >
                     <img
                       src={img}
                       alt={product.name}
-                      className="w-10 h-12 object-cover rounded-md bg-[#FBECEF] border border-[#E8DADD]/50"
+                      className="w-10 h-12 object-cover rounded-md bg-[#F7EFE9] border border-[#F0DFD8]"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-[#252223] truncate">
+                      <p className="text-xs font-medium text-[#211A1C] truncate">
                         {product.name}
                       </p>
-                      <p className="text-[11px] text-[#C85C7A] font-semibold">
+                      <p className="text-[11px] text-[#B87D4B] font-semibold">
                         {formatPrice(product.price)}
                       </p>
                     </div>
                   </Link>
                 );
               })}
-              <div className="p-2.5 bg-[#FAF8F3] text-center">
+              <div className="p-2.5 bg-[#FFF9F5] text-center border-t border-[#F0DFD8]">
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="text-xs font-semibold text-[#C85C7A] hover:text-[#A84462] transition-colors"
+                  className="text-xs font-semibold text-[#B87D4B] hover:text-[#9E6536] transition-colors cursor-pointer"
                 >
                   View all results for "{query}" →
                 </button>
@@ -153,7 +157,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           ) : (
             <div className="p-6 text-center text-xs text-[#756D70]">
-              No products found matching "<strong className="text-[#252223]">{query}</strong>"
+              No products found matching "<strong className="text-[#211A1C]">{query}</strong>"
             </div>
           )}
         </div>

@@ -52,7 +52,7 @@ export const AccountPage: React.FC = () => {
       case "processing":
       case "confirmed":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#FBECEF] text-[#C85C7A]">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#F7EFE9] text-[#B87D4B]">
             <Clock className="w-3 h-3" />
             <span className="capitalize">{status}</span>
           </span>
@@ -106,19 +106,25 @@ export const AccountPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Header Profile Summary */}
-      <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-10 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
+        {/* Subtle decorative gold top bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-[#D4AF37]" />
+
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center font-serif-luxury text-2xl font-bold">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F7EFE9] to-[#E8DDD4] text-[#B87D4B] border border-[#D4AF37]/30 flex items-center justify-center font-serif-luxury text-2xl font-bold shadow-xs">
             {user?.profile?.firstName?.charAt(0) || user?.email?.charAt(0) || "U"}
           </div>
           <div>
-            <h1 className="font-serif-luxury text-2xl sm:text-3xl font-medium text-[#252223]">
+            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#B87D4B] block">
+              Client Profile
+            </span>
+            <h1 className="font-serif-luxury text-2xl sm:text-3xl font-medium text-[#211A1C]">
               {user?.profile?.firstName
                 ? `${user.profile.firstName} ${user.profile.lastName}`
                 : "My Account"}
             </h1>
             <p className="text-xs text-[#756D70] mt-0.5">{user?.email}</p>
-            <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#FAF8F3] border border-[#E8DADD] text-[10px] uppercase font-semibold tracking-wider text-[#C85C7A]">
+            <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-white border border-[#D4AF37]/40 text-[10px] uppercase font-semibold tracking-wider text-[#B87D4B]">
               {user?.role} Account
             </span>
           </div>
@@ -126,7 +132,7 @@ export const AccountPage: React.FC = () => {
 
         <Link
           to="/shop"
-          className="px-6 py-2.5 rounded-full border border-[#252223] text-xs font-semibold uppercase tracking-wider text-[#252223] hover:bg-[#252223] hover:text-white transition-colors"
+          className="px-6 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs"
         >
           Explore Formulations
         </Link>
@@ -134,9 +140,9 @@ export const AccountPage: React.FC = () => {
 
       {/* Orders Section */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-[#E8DADD] pb-4">
-          <h2 className="font-serif-luxury text-2xl font-normal text-[#252223] flex items-center gap-2.5">
-            <Package className="w-5 h-5 text-[#C85C7A]" />
+        <div className="flex items-center justify-between border-b border-[#F0DFD8] pb-4">
+          <h2 className="font-serif-luxury text-2xl font-normal text-[#211A1C] flex items-center gap-2.5">
+            <Package className="w-5 h-5 text-[#B87D4B]" />
             <span>My Orders ({orders.length})</span>
           </h2>
         </div>
@@ -144,11 +150,11 @@ export const AccountPage: React.FC = () => {
         {loading ? (
           <Loader text="Loading your purchase history..." />
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#E8DADD] p-12 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center mx-auto">
+          <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-12 text-center space-y-4 shadow-xs">
+            <div className="w-16 h-16 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-serif-luxury text-xl text-[#252223]">
+            <h3 className="font-serif-luxury text-xl text-[#211A1C]">
               No orders yet
             </h3>
             <p className="text-xs text-[#756D70] max-w-sm mx-auto">
@@ -156,7 +162,7 @@ export const AccountPage: React.FC = () => {
             </p>
             <Link
               to="/shop"
-              className="inline-block px-6 py-2.5 rounded-full bg-[#C85C7A] text-white text-xs font-semibold hover:bg-[#A84462] transition-colors"
+              className="inline-block px-6 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold transition-all shadow-xs"
             >
               Start Shopping
             </Link>
@@ -174,10 +180,10 @@ export const AccountPage: React.FC = () => {
               return (
                 <div
                   key={order._id}
-                  className="bg-white rounded-2xl border border-[#E8DADD] overflow-hidden shadow-2xs transition-all hover:border-[#C85C7A]/40"
+                  className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] overflow-hidden shadow-2xs transition-all hover:border-gold-metallic/50"
                 >
                   {/* Order Card Header */}
-                  <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FAF8F3]/30">
+                  <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FFF9F5]/80">
                     <div className="space-y-1">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-sm font-bold text-[#252223]">

@@ -1,9 +1,13 @@
 import { formatPrice } from "./formatPrice";
 
 export interface CartItemWhatsApp {
-  name: string;
+  name?: string;
+  price?: number;
   quantity: number;
-  price: number;
+  product?: {
+    name: string;
+    price: number;
+  };
 }
 
 export const generateClientWhatsAppMessage = (
@@ -13,10 +17,11 @@ export const generateClientWhatsAppMessage = (
   total: number
 ): string => {
   const itemLines = items
-    .map(
-      (item, idx) =>
-        `${idx + 1}. ${item.name}\n   Qty: ${item.quantity} | ${formatPrice(item.price)}`
-    )
+    .map((item, idx) => {
+      const name = item.product?.name || item.name || "Formulation";
+      const price = item.product?.price ?? item.price ?? 0;
+      return `${idx + 1}. ${name}\n   Qty: ${item.quantity} | ${formatPrice(price)}`;
+    })
     .join("\n\n");
 
   return [
@@ -32,3 +37,5 @@ export const generateClientWhatsAppMessage = (
     "Hello! I would like to place this order via WhatsApp. Please advise.",
   ].join("\n");
 };
+
+export const generateWhatsAppMessage = generateClientWhatsAppMessage;

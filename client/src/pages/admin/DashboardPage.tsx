@@ -88,16 +88,16 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Top Welcome & Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-[#E8DADD]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-[#F0DFD8]">
         <div>
-          <span className="text-xs uppercase tracking-widest font-semibold text-[#C85C7A]">Atelier Operations</span>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#252223]">Dashboard Overview</h1>
+          <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-gold-metallic">Atelier Operations</span>
+          <h1 className="text-2xl sm:text-3xl font-serif-luxury font-bold text-[#211A1C]">Dashboard Overview</h1>
           <p className="text-xs sm:text-sm text-[#756D70] mt-0.5">Real-time performance snapshot and catalog vitals</p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             to="/admin/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C85C7A] hover:bg-[#A84462] text-white text-xs sm:text-sm font-medium rounded-full shadow-sm hover:shadow transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs sm:text-sm font-semibold rounded-full shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Product</span>
@@ -105,7 +105,7 @@ const DashboardPage: React.FC = () => {
           <Link
             to="/shop"
             target="_blank"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-[#E8DADD] hover:border-[#C85C7A] text-[#252223] text-xs sm:text-sm font-medium rounded-full transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-[#D4AF37]/40 hover:bg-[#FFF9F5] text-[#211A1C] text-xs sm:text-sm font-medium rounded-full transition-colors shadow-2xs"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#756D70]" />
             <span>View Store</span>
@@ -116,14 +116,14 @@ const DashboardPage: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Total Revenue */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8DADD] shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-[#FFFCFA] p-5 rounded-2xl border border-[#F0DFD8] shadow-2xs hover:shadow-sm transition-shadow">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#756D70]">Paid Revenue</span>
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#56805D] flex items-center justify-center">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl font-serif font-bold text-[#252223]">
+          <div className="text-2xl font-serif-luxury font-bold text-[#211A1C]">
             {formatPrice(totalRevenue)}
           </div>
           <p className="text-xs text-[#756D70] mt-2 flex items-center gap-1">
@@ -133,14 +133,14 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {/* Total Orders */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8DADD] shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-[#FFFCFA] p-5 rounded-2xl border border-[#F0DFD8] shadow-2xs hover:shadow-sm transition-shadow">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#756D70]">Total Orders</span>
-            <div className="w-10 h-10 rounded-xl bg-[#FBECEF] text-[#C85C7A] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl font-serif font-bold text-[#252223]">
+          <div className="text-2xl font-serif-luxury font-bold text-[#211A1C]">
             {orders.length}
           </div>
           <div className="flex items-center justify-between text-xs text-[#756D70] mt-2">
@@ -150,14 +150,14 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {/* Active Products */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8DADD] shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-[#FFFCFA] p-5 rounded-2xl border border-[#F0DFD8] shadow-2xs hover:shadow-sm transition-shadow">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#756D70]">Catalog Items</span>
-            <div className="w-10 h-10 rounded-xl bg-[#F3D6DE]/50 text-[#A84462] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center">
               <Package className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl font-serif font-bold text-[#252223]">
+          <div className="text-2xl font-serif-luxury font-bold text-[#211A1C]">
             {products.length}
           </div>
           <p className="text-xs text-[#756D70] mt-2">
@@ -166,7 +166,7 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8DADD] shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-[#FFFCFA] p-5 rounded-2xl border border-[#F0DFD8] shadow-2xs hover:shadow-sm transition-shadow">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#756D70]">Inventory Vitals</span>
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -175,7 +175,7 @@ const DashboardPage: React.FC = () => {
               {lowStockProducts.length > 0 ? <AlertTriangle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
             </div>
           </div>
-          <div className={`text-2xl font-serif font-bold ${lowStockProducts.length > 0 ? 'text-amber-600' : 'text-[#252223]'}`}>
+          <div className={`text-2xl font-serif-luxury font-bold ${lowStockProducts.length > 0 ? 'text-amber-600' : 'text-[#211A1C]'}`}>
             {lowStockProducts.length}
           </div>
           <p className="text-xs text-[#756D70] mt-2">
@@ -187,15 +187,15 @@ const DashboardPage: React.FC = () => {
       {/* Two Column Layout: Recent Orders & Low Stock Inventory */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Orders (2 Columns) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#E8DADD] p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#FAF8F3]">
+        <div className="lg:col-span-2 bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-6 shadow-2xs">
+          <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#F0DFD8]">
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#252223]">Recent Orders</h2>
+              <h2 className="font-serif-luxury text-lg font-bold text-[#211A1C]">Recent Orders</h2>
               <p className="text-xs text-[#756D70]">Latest client acquisitions</p>
             </div>
             <Link
               to="/admin/orders"
-              className="text-xs font-semibold text-[#C85C7A] hover:text-[#A84462] flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-[#B87D4B] hover:text-[#9E6536] flex items-center gap-1 transition-colors"
             >
               <span>View all ({orders.length})</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -222,7 +222,7 @@ const DashboardPage: React.FC = () => {
                   {recentOrders.map((ord) => (
                     <tr key={ord._id} className="hover:bg-[#FAF8F3]/50 transition-colors">
                       <td className="py-3 font-medium text-[#252223]">
-                        <Link to={`/admin/orders`} className="hover:text-[#C85C7A] font-mono">
+                        <Link to={`/admin/orders`} className="hover:text-[#B87D4B] font-mono">
                           {ord.orderNumber}
                         </Link>
                       </td>
@@ -267,16 +267,16 @@ const DashboardPage: React.FC = () => {
         </div>
 
         {/* Low Stock Alerts (1 Column) */}
-        <div className="bg-white rounded-2xl border border-[#E8DADD] p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-[#FFFCFA] rounded-2xl border border-[#F0DFD8] p-6 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#FAF8F3]">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#F0DFD8]">
               <div>
-                <h2 className="font-serif text-lg font-bold text-[#252223]">Low Inventory</h2>
+                <h2 className="font-serif-luxury text-lg font-bold text-[#211A1C]">Low Inventory</h2>
                 <p className="text-xs text-[#756D70]">Requires restocking</p>
               </div>
               <Link
                 to="/admin/products"
-                className="text-xs font-semibold text-[#C85C7A] hover:text-[#A84462] flex items-center gap-1 transition-colors"
+                className="text-xs font-semibold text-[#B87D4B] hover:text-[#9E6536] flex items-center gap-1 transition-colors"
               >
                 <span>Inventory</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -293,7 +293,7 @@ const DashboardPage: React.FC = () => {
                 {lowStockProducts.slice(0, 5).map((prod) => (
                   <div 
                     key={prod._id}
-                    className="flex items-center justify-between p-2.5 rounded-xl border border-[#FAF8F3] hover:border-[#E8DADD] bg-[#FAF8F3]/30 transition-all"
+                    className="flex items-center justify-between p-2.5 rounded-xl border border-[#F0DFD8] hover:border-gold-metallic/40 bg-[#FFF9F5]/40 transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <img 
@@ -302,7 +302,7 @@ const DashboardPage: React.FC = () => {
                         className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                       />
                       <div className="min-w-0">
-                        <h4 className="text-xs font-semibold text-[#252223] truncate">{prod.name}</h4>
+                        <h4 className="text-xs font-semibold text-[#211A1C] truncate">{prod.name}</h4>
                         <span className="text-[10px] text-[#756D70]">{formatPrice(prod.price)}</span>
                       </div>
                     </div>
@@ -314,7 +314,7 @@ const DashboardPage: React.FC = () => {
                       </span>
                       <Link
                         to={`/admin/products/${prod._id}/edit`}
-                        className="text-xs text-[#C85C7A] hover:text-[#A84462] p-1 rounded hover:bg-white"
+                        className="text-xs text-[#B87D4B] hover:text-[#9E6536] p-1 rounded hover:bg-white"
                         title="Edit stock"
                       >
                         Edit
@@ -326,10 +326,10 @@ const DashboardPage: React.FC = () => {
             )}
           </div>
 
-          <div className="pt-4 mt-6 border-t border-[#FAF8F3]">
+          <div className="pt-4 mt-6 border-t border-[#F0DFD8]">
             <Link
               to="/admin/products/new"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#FAF8F3] hover:bg-[#FBECEF] text-[#252223] hover:text-[#C85C7A] text-xs font-semibold rounded-xl border border-[#E8DADD] transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#FFF9F5] hover:bg-[#F7EFE9] text-[#211A1C] hover:text-[#B87D4B] text-xs font-semibold rounded-xl border border-[#F0DFD8] transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Create New Catalog Entry</span>

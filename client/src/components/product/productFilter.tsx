@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Category } from "../../types/category";
-import { Filter, X, RotateCcw } from "lucide-react";
+import { ChevronDown, X, Sparkles, Check } from "lucide-react";
 
-interface ProductFilterProps {
+export interface ProductFilterProps {
   categories: Category[];
   selectedCategory: string;
   onSelectCategory: (categorySlug: string) => void;
@@ -18,7 +18,78 @@ interface ProductFilterProps {
   activeFilterCount: number;
   isOpenMobile: boolean;
   setIsOpenMobile: (open: boolean) => void;
+  // Additional attribute filters matching Image 2
+  skinType?: string;
+  onSkinTypeChange?: (val: string) => void;
+  skinConcern?: string;
+  onSkinConcernChange?: (val: string) => void;
+  form?: string;
+  onFormChange?: (val: string) => void;
+  ingredient?: string;
+  onIngredientChange?: (val: string) => void;
+  aroma?: string;
+  onAromaChange?: (val: string) => void;
+  onApplyFilters?: () => void;
 }
+
+const SKIN_TYPES = [
+  { label: "All Skin Types", value: "" },
+  { label: "Sensitive", value: "sensitive" },
+  { label: "Dry & Dehydrated", value: "dry" },
+  { label: "Oily & Blemish-Prone", value: "oily" },
+  { label: "Combination", value: "combination" },
+  { label: "Normal", value: "normal" },
+  { label: "Mature", value: "mature" },
+];
+
+const SKIN_CONCERNS = [
+  { label: "All Concerns", value: "" },
+  { label: "Deep Hydration & Moisture", value: "hydration" },
+  { label: "Radiance & Brightening", value: "radiance" },
+  { label: "Anti-Aging & Fine Lines", value: "anti-aging" },
+  { label: "Blemish & Clarifying", value: "blemish" },
+  { label: "Firming & Elasticity", value: "firming" },
+  { label: "Soothing & Calming", value: "soothing" },
+];
+
+const PRODUCT_FORMS = [
+  { label: "All Forms", value: "" },
+  { label: "Serum & Elixir", value: "serum" },
+  { label: "Cream & Moisturizer", value: "cream" },
+  { label: "Cleanser & Polish", value: "cleanser" },
+  { label: "Oil & Balm", value: "oil" },
+  { label: "Mask & Treatment", value: "mask" },
+  { label: "Lotion & Mist", value: "lotion" },
+];
+
+const INGREDIENTS = [
+  { label: "All Ingredients", value: "" },
+  { label: "Hyaluronic Acid", value: "hyaluronic" },
+  { label: "Niacinamide", value: "niacinamide" },
+  { label: "Botanical Squalane", value: "squalane" },
+  { label: "Vitamin C", value: "vitamin-c" },
+  { label: "Organic Argan Oil", value: "argan" },
+  { label: "Rose & Botanical Water", value: "rose" },
+  { label: "Shea & Almond Butter", value: "shea" },
+];
+
+const AROMAS = [
+  { label: "All Aromas", value: "" },
+  { label: "Floral Rose", value: "rose" },
+  { label: "Citrus & Bergamot", value: "citrus" },
+  { label: "Warm Amber & Vanilla", value: "amber" },
+  { label: "Fresh Botanical", value: "botanical" },
+  { label: "Herbaceous", value: "herbaceous" },
+  { label: "100% Fragrance-Free", value: "fragrance-free" },
+];
+
+const PRICE_PRESETS = [
+  { label: "All Prices", min: "", max: "" },
+  { label: "Under LKR 3,500", min: "", max: "3500" },
+  { label: "LKR 3,500 – 6,000", min: "3500", max: "6000" },
+  { label: "LKR 6,000 – 10,000", min: "6000", max: "10000" },
+  { label: "Over LKR 10,000", min: "10000", max: "" },
+];
 
 export const ProductFilter: React.FC<ProductFilterProps> = ({
   categories,
@@ -30,190 +101,479 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
   onMaxPriceChange,
   inStockOnly,
   onToggleInStock,
-  sort,
-  onSortChange,
   onResetFilters,
   activeFilterCount,
   isOpenMobile,
   setIsOpenMobile,
+  skinType = "",
+  onSkinTypeChange,
+  skinConcern = "",
+  onSkinConcernChange,
+  form = "",
+  onFormChange,
+  ingredient = "",
+  onIngredientChange,
+  aroma = "",
+  onAromaChange,
+  onApplyFilters,
 }) => {
-  const filterContent = (
-    <div className="space-y-6">
-      {/* Category Filter */}
-      <div>
-        <h4 className="font-serif-luxury text-sm font-semibold text-[#252223] mb-3">
-          Categories
-        </h4>
-        <div className="space-y-1">
-          <button
-            type="button"
-            onClick={() => onSelectCategory("")}
-            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
-              selectedCategory === ""
-                ? "bg-[#C85C7A] text-white"
-                : "text-[#756D70] hover:bg-[#FBECEF] hover:text-[#252223]"
-            }`}
-          >
-            <span>All Categories</span>
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat._id}
-              type="button"
-              onClick={() => onSelectCategory(cat.slug)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
-                selectedCategory === cat.slug
-                  ? "bg-[#C85C7A] text-white"
-                  : "text-[#756D70] hover:bg-[#FBECEF] hover:text-[#252223]"
-              }`}
-            >
-              <span>{cat.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+  // Accordion open/close state matching Image 2
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    price: true,
+    filter: true,
+    skinType: false,
+    skinConcern: false,
+    form: false,
+    ingredients: false,
+    aroma: false,
+  });
 
-      {/* Price Range Filter */}
-      <div>
-        <h4 className="font-serif-luxury text-sm font-semibold text-[#252223] mb-3">
-          Price Range (Rs.)
-        </h4>
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-[11px] text-[#756D70] mb-1">Min</label>
-            <input
-              type="number"
-              placeholder="0"
-              value={minPrice}
-              onChange={(e) => onMinPriceChange(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-[#E8DADD] text-xs bg-white text-[#252223] focus:outline-hidden focus:border-[#C85C7A]"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] text-[#756D70] mb-1">Max</label>
-            <input
-              type="number"
-              placeholder="20,000"
-              value={maxPrice}
-              onChange={(e) => onMaxPriceChange(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-[#E8DADD] text-xs bg-white text-[#252223] focus:outline-hidden focus:border-[#C85C7A]"
-            />
-          </div>
-        </div>
-      </div>
+  const toggleSection = (section: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
-      {/* Availability Filter */}
-      <div>
-        <h4 className="font-serif-luxury text-sm font-semibold text-[#252223] mb-3">
-          Availability
-        </h4>
-        <label className="flex items-center gap-2.5 cursor-pointer text-xs text-[#252223]">
-          <input
-            type="checkbox"
-            checked={inStockOnly}
-            onChange={(e) => onToggleInStock(e.target.checked)}
-            className="w-4 h-4 rounded-sm border-[#E8DADD] text-[#C85C7A] focus:ring-[#C85C7A]"
-          />
-          <span>In Stock Only</span>
-        </label>
-      </div>
+  const handleApply = () => {
+    if (onApplyFilters) onApplyFilters();
+    if (isOpenMobile) setIsOpenMobile(false);
+  };
 
-      {/* Reset Button */}
-      {activeFilterCount > 0 && (
+  const filterAccordionContent = (
+    <div className="divide-y divide-[#EFE7DE] text-[#211A1C]">
+      {/* 1. PRICE ACCORDION */}
+      <div className="py-3">
         <button
           type="button"
-          onClick={onResetFilters}
-          className="w-full py-2 px-3 rounded-lg border border-[#E8DADD] text-[#756D70] hover:text-[#B33A3A] hover:border-[#B33A3A]/40 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+          onClick={() => toggleSection("price")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset Filters ({activeFilterCount})</span>
+          <span className="tracking-wide">Price</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.price ? "rotate-180" : ""
+            }`}
+          />
         </button>
-      )}
+
+        {openSections.price && (
+          <div className="pt-3 pb-2 space-y-3 animate-in fade-in duration-150">
+            {/* Quick Price Ranges */}
+            <div className="space-y-1">
+              {PRICE_PRESETS.map((preset, idx) => {
+                const isSelected =
+                  minPrice === preset.min && maxPrice === preset.max;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      onMinPriceChange(preset.min);
+                      onMaxPriceChange(preset.max);
+                    }}
+                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                      isSelected
+                        ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                        : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                    }`}
+                  >
+                    <span>{preset.label}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Custom Min / Max Price Inputs */}
+            <div className="pt-2 border-t border-[#F5ECE5]">
+              <span className="block text-[11px] font-semibold text-[#8A7E81] uppercase tracking-wider mb-1.5">
+                Custom Range (LKR)
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Min (0)"
+                    value={minPrice}
+                    onChange={(e) => onMinPriceChange(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EFE7DE] text-xs bg-[#FFFCFA] text-[#211A1C] placeholder-[#A89C9F] focus:outline-none focus:border-[#B87D4B]"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={maxPrice}
+                    onChange={(e) => onMaxPriceChange(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EFE7DE] text-xs bg-[#FFFCFA] text-[#211A1C] placeholder-[#A89C9F] focus:outline-none focus:border-[#B87D4B]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* In Stock Toggle */}
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-[#5C5255] hover:text-[#211A1C] pt-1">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => onToggleInStock(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-[#D8CEC4] text-[#B87D4B] focus:ring-[#B87D4B]"
+              />
+              <span>In Stock Only</span>
+            </label>
+          </div>
+        )}
+      </div>
+
+      {/* 2. FILTER / CATEGORY ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("filter")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Category</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.filter ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.filter && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            <button
+              type="button"
+              onClick={() => onSelectCategory("")}
+              className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                selectedCategory === ""
+                  ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                  : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+              }`}
+            >
+              <span>All Formulations</span>
+              {selectedCategory === "" && (
+                <Check className="w-3.5 h-3.5 text-[#B87D4B]" />
+              )}
+            </button>
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat.slug;
+              return (
+                <button
+                  key={cat._id}
+                  type="button"
+                  onClick={() => onSelectCategory(cat.slug)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{cat.name}</span>
+                  {isSelected && (
+                    <Check className="w-3.5 h-3.5 text-[#B87D4B]" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 3. SKIN TYPE ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("skinType")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Skin type</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.skinType ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.skinType && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {SKIN_TYPES.map((item) => {
+              const isSelected = skinType === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onSkinTypeChange && onSkinTypeChange(item.value)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 4. SKIN CONCERN ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("skinConcern")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Skin concern</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.skinConcern ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.skinConcern && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {SKIN_CONCERNS.map((item) => {
+              const isSelected = skinConcern === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() =>
+                    onSkinConcernChange && onSkinConcernChange(item.value)
+                  }
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 5. FORM ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("form")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Form</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.form ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.form && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {PRODUCT_FORMS.map((item) => {
+              const isSelected = form === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onFormChange && onFormChange(item.value)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 6. INGREDIENTS ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("ingredients")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Ingredients</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.ingredients ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.ingredients && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {INGREDIENTS.map((item) => {
+              const isSelected = ingredient === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() =>
+                    onIngredientChange && onIngredientChange(item.value)
+                  }
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 7. AROMA ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("aroma")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Aroma</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.aroma ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.aroma && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {AROMAS.map((item) => {
+              const isSelected = aroma === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onAromaChange && onAromaChange(item.value)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 
   return (
     <>
-      {/* Top Filter Bar with Sort and Mobile Filter Button */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[#E8DADD]">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsOpenMobile(true)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-[#E8DADD] bg-white text-xs font-semibold text-[#252223] hover:border-[#C85C7A]"
-          >
-            <Filter className="w-3.5 h-3.5 text-[#C85C7A]" />
-            <span>Filters</span>
-            {activeFilterCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-[#C85C7A] text-white text-[10px] flex items-center justify-center">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Sort Dropdown */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-[#756D70] hidden sm:inline">Sort by:</span>
-          <select
-            value={sort}
-            onChange={(e) => onSortChange(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-[#E8DADD] bg-white text-[#252223] text-xs font-medium focus:outline-hidden focus:border-[#C85C7A]"
-          >
-            <option value="newest">Newest Arrivals</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name-asc">Name: A to Z</option>
-            <option value="name-desc">Name: Z to A</option>
-            <option value="oldest">Oldest</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Desktop Sidebar Filter */}
-      <aside className="hidden lg:block w-64 flex-shrink-0 bg-white rounded-2xl border border-[#E8DADD] p-6 shadow-xs h-fit sticky top-28">
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E8DADD]/60">
-          <h3 className="font-serif-luxury text-base font-semibold text-[#252223] flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#C85C7A]" />
-            <span>Refine By</span>
+      {/* =========================================================================
+          DESKTOP SIDEBAR (Styled exactly as in Screenshot 2)
+         ========================================================================= */}
+      <aside className="hidden lg:block w-72 shrink-0 bg-white border border-[#EFE7DE] rounded-2xl shadow-xs sticky top-28 overflow-hidden">
+        {/* Header matching Screenshot 2 */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE7DE] bg-[#FCF9F7]">
+          <h3 className="font-serif-luxury text-base font-semibold text-[#211A1C]">
+            Filter by
           </h3>
           {activeFilterCount > 0 && (
-            <span className="text-[11px] text-[#C85C7A] font-semibold">
+            <span className="text-[11px] font-bold text-[#B87D4B] bg-[#F7EFE9] px-2.5 py-0.5 rounded-full">
               {activeFilterCount} Active
             </span>
           )}
         </div>
-        {filterContent}
+
+        {/* Scrollable Accordions */}
+        <div className="px-5 max-h-[calc(100vh-280px)] overflow-y-auto">
+          {filterAccordionContent}
+        </div>
+
+        {/* Bottom Bar: RESET ALL and APPLY > matching Screenshot 2 */}
+        <div className="flex items-center justify-between border-t border-[#EFE7DE] bg-[#FCF9F7] px-5 py-3">
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="text-xs font-bold uppercase tracking-wider text-[#5C5255] hover:text-[#B33A3A] transition-colors"
+          >
+            RESET ALL
+          </button>
+          <button
+            type="button"
+            onClick={handleApply}
+            className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#211A1C] hover:bg-[#B87D4B] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs"
+          >
+            <span>APPLY</span>
+            <span className="text-sm">›</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile Drawer Filter */}
+      {/* =========================================================================
+          MOBILE DRAWER (Exact Screenshot 2 structure with Cancel ✕)
+         ========================================================================= */}
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-[#211A1C]/60 backdrop-blur-xs transition-opacity"
             onClick={() => setIsOpenMobile(false)}
           />
-          <div className="relative ml-auto w-full max-w-xs bg-white h-full shadow-2xl flex flex-col p-6 overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E8DADD]">
-              <h3 className="font-serif-luxury text-base font-semibold text-[#252223]">
-                Filter Formulations
+
+          {/* Drawer Panel */}
+          <div className="relative ml-auto w-full max-w-sm bg-white h-full shadow-2xl flex flex-col z-10">
+            {/* Header: "Filter by" and "Cancel ✕" matching Screenshot 2 */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE7DE] bg-[#FCF9F7]">
+              <h3 className="font-serif-luxury text-lg font-semibold text-[#211A1C]">
+                Filter by
               </h3>
               <button
                 type="button"
                 onClick={() => setIsOpenMobile(false)}
-                className="p-1 rounded-full text-[#756D70] hover:text-[#252223]"
+                className="flex items-center gap-1 text-xs font-semibold text-[#5C5255] hover:text-[#211A1C] p-1"
               >
-                <X className="w-5 h-5" />
+                <span>Cancel</span>
+                <X className="w-4 h-4 ml-0.5" />
               </button>
             </div>
-            {filterContent}
-            <div className="mt-8 pt-4 border-t border-[#E8DADD]">
+
+            {/* Scrollable Content */}
+            <div className="flex-1 px-5 py-2 overflow-y-auto">
+              {filterAccordionContent}
+            </div>
+
+            {/* Sticky Footer: "RESET ALL" and "APPLY >" */}
+            <div className="flex items-center justify-between border-t border-[#EFE7DE] bg-[#FCF9F7] px-5 py-3.5">
               <button
                 type="button"
-                onClick={() => setIsOpenMobile(false)}
-                className="w-full py-3 rounded-full bg-[#C85C7A] text-white text-xs font-semibold hover:bg-[#A84462] transition-colors"
+                onClick={onResetFilters}
+                className="text-xs font-bold uppercase tracking-wider text-[#5C5255] hover:text-[#B33A3A] transition-colors"
               >
-                Apply Filters
+                RESET ALL
+              </button>
+              <button
+                type="button"
+                onClick={handleApply}
+                className="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#211A1C] hover:bg-[#B87D4B] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs"
+              >
+                <span>APPLY</span>
+                <span className="text-sm">›</span>
               </button>
             </div>
           </div>
