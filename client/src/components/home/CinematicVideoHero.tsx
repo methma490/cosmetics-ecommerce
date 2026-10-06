@@ -89,18 +89,8 @@ export const CinematicVideoHero: React.FC = () => {
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
   const activeScene = HERO_SCENES[activeSceneIndex];
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const fn = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", fn);
-    return () => mq.removeEventListener("change", fn);
-  }, []);
 
   // When scene changes, reset ready state and play
   useEffect(() => {
@@ -137,15 +127,6 @@ export const CinematicVideoHero: React.FC = () => {
     return () => io.disconnect();
   }, [paused]);
 
-  const onMove = (e: React.MouseEvent) => {
-    if (reducedMotion) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    setParallax({
-      x: ((e.clientX - r.left) / r.width - 0.5) * 2,
-      y: ((e.clientY - r.top) / r.height - 0.5) * 2,
-    });
-  };
-
   const togglePause = () => {
     const next = !paused;
     setPaused(next);
@@ -171,7 +152,6 @@ export const CinematicVideoHero: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      onMouseMove={onMove}
       data-paused={paused ? "1" : "0"}
       className="aura-hero relative w-full min-h-[92vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#140e11]"
     >

@@ -27,7 +27,7 @@ export const ShopPage: React.FC = () => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
+  const [, setTotalCount] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState<boolean>(false);
@@ -235,214 +235,10 @@ export const ShopPage: React.FC = () => {
   }, [category, categories]);
 
   return (
-    <div className="min-h-screen bg-[#FFF9F5] py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-[#FFF9F5] py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* =========================================================================
-            CLEAN EDITORIAL HEADER (Without redundant duplicate search bar)
-           ========================================================================= */}
-        <div className="pb-6 border-b border-[#EFE7DE]">
-          <div className="flex items-center gap-2 text-[11px] font-bold text-[#B87D4B] uppercase tracking-[0.25em] mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#B87D4B]" />
-            <span>Haute Beauté Catalog</span>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <h1 className="font-serif-luxury text-3xl sm:text-5xl font-normal text-[#211A1C] tracking-tight">
-                {activeCategoryName ? activeCategoryName : "All Formulations"}
-              </h1>
-              <p className="text-xs text-[#7D7275] mt-1.5 font-light">
-                Curated apothecary formulations handcrafted with cold-pressed botanicals & peptides.
-              </p>
-            </div>
-
-            <p className="text-xs text-[#7D7275] shrink-0 font-medium">
-              Presenting{" "}
-              <strong className="text-[#211A1C] font-semibold">
-                {loading ? "..." : displayedProducts.length}
-              </strong>{" "}
-              botanical creations
-            </p>
-          </div>
-        </div>
-
-        {/* =========================================================================
-            ACTIVE REFINEMENTS (Sleek, subtle pill tags)
-           ========================================================================= */}
-        {activeFilterCount > 0 && (
-          <div className="flex flex-wrap items-center gap-2 py-2">
-            <span className="text-xs font-medium text-[#7D7275]">Active refinements:</span>
-
-            {search && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
-                <span>Search: "{search}"</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ search: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {category && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
-                <span>Category: {activeCategoryName}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ category: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {(minPrice || maxPrice) && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
-                <span>
-                  LKR {minPrice || "0"} – {maxPrice || "Any"}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ minPrice: null, maxPrice: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {skinType && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
-                <span>Skin: {skinType}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ skinType: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {skinConcern && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
-                <span>Concern: {skinConcern}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ skinConcern: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {form && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
-                <span>Form: {form}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ form: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {ingredient && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
-                <span>Ingredient: {ingredient}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ ingredient: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {aroma && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
-                <span>Aroma: {aroma}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ aroma: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            {inStock && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
-                <span>In Stock Only</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ inStock: null })}
-                  className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="text-xs text-[#B87D4B] hover:text-[#9E6536] hover:underline font-bold ml-1.5"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
-
-        {/* =========================================================================
-            CATALOG CONTROLS: Mobile Filter Trigger & Sort Order
-           ========================================================================= */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#EFE7DE]">
-          <div className="flex items-center gap-3">
-            {/* Mobile Filter Button */}
-            <button
-              type="button"
-              onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-xl border border-[#D8CEC4] bg-white text-xs font-semibold text-[#211A1C] hover:border-[#B87D4B] shadow-2xs transition-colors"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#B87D4B]" />
-              <span>Filter by</span>
-              {activeFilterCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-[#B87D4B] text-white text-[10px] flex items-center justify-center font-bold">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2 text-xs ml-auto">
-            <span className="text-[#7D7275] hidden sm:inline font-medium">Sort Order:</span>
-            <select
-              value={sort}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="px-3.5 py-2 rounded-xl border border-[#EFE7DE] bg-white text-[#211A1C] text-xs font-medium focus:outline-none focus:border-[#B87D4B] shadow-2xs cursor-pointer"
-            >
-              <option value="newest">Newest Arrivals</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Alphabetical: A to Z</option>
-              <option value="name-desc">Alphabetical: Z to A</option>
-              <option value="oldest">Earliest Formulations</option>
-            </select>
-          </div>
-        </div>
-
-        {/* =========================================================================
-            MAIN LAYOUT: SIDEBAR (Matching Screenshot 2) + PRODUCTS
+            MAIN LAYOUT: STICKY SIDEBAR (Image 1) + PRODUCT GRID
            ========================================================================= */}
         <div className="flex gap-8 items-start">
           {/* Filter Sidebar */}
@@ -478,7 +274,157 @@ export const ShopPage: React.FC = () => {
           />
 
           {/* Product Grid Area */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-4">
+            {/* Mobile Filter Trigger (Only on small screens where sidebar is hidden) */}
+            <div className="lg:hidden pb-1">
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#D8CEC4] bg-white text-xs font-semibold text-[#211A1C] hover:border-[#B87D4B] shadow-2xs transition-colors"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[#B87D4B]" />
+                <span>Filter by</span>
+                {activeFilterCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-[#B87D4B] text-white text-[10px] flex items-center justify-center font-bold">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Active Refinements Pill Tags (if any filter is applied) */}
+            {activeFilterCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2 py-1">
+                <span className="text-xs font-medium text-[#7D7275]">Active:</span>
+
+                {search && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
+                    <span>Search: "{search}"</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ search: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {category && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
+                    <span>Category: {activeCategoryName}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ category: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {(minPrice || maxPrice) && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
+                    <span>
+                      LKR {minPrice || "0"} – {maxPrice || "Any"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ minPrice: null, maxPrice: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {skinType && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
+                    <span>Skin: {skinType}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ skinType: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {skinConcern && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
+                    <span>Concern: {skinConcern}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ skinConcern: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {form && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
+                    <span>Form: {form}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ form: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {ingredient && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
+                    <span>Ingredient: {ingredient}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ ingredient: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {aroma && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs capitalize">
+                    <span>Aroma: {aroma}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ aroma: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {inStock && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#EFE7DE] text-xs font-medium text-[#211A1C] shadow-2xs">
+                    <span>In Stock Only</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuery({ inStock: null })}
+                      className="text-[#8A7E81] hover:text-[#B33A3A] transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="text-xs text-[#B87D4B] hover:text-[#9E6536] hover:underline font-bold ml-1.5"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
             {displayedProducts.length > 0 ? (
               <ProductGrid
                 products={displayedProducts}

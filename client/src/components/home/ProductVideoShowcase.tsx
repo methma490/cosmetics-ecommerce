@@ -12,7 +12,6 @@ import {
   MessageCircle,
   CheckCircle2,
   Droplets,
-  ShieldCheck,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import type { Product } from "../../types/product";

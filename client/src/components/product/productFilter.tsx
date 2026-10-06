@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { Category } from "../../types/category";
-import { ChevronDown, X, Sparkles, Check } from "lucide-react";
+import { ChevronDown, X, Check } from "lucide-react";
 
 export interface ProductFilterProps {
   categories: Category[];
@@ -91,6 +91,15 @@ const PRICE_PRESETS = [
   { label: "Over LKR 10,000", min: "10000", max: "" },
 ];
 
+const SORT_OPTIONS = [
+  { label: "Newest Arrivals", value: "newest" },
+  { label: "Price: Low to High", value: "price-asc" },
+  { label: "Price: High to Low", value: "price-desc" },
+  { label: "Alphabetical: A to Z", value: "name-asc" },
+  { label: "Alphabetical: Z to A", value: "name-desc" },
+  { label: "Earliest Formulations", value: "oldest" },
+];
+
 export const ProductFilter: React.FC<ProductFilterProps> = ({
   categories,
   selectedCategory,
@@ -101,6 +110,8 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
   onMaxPriceChange,
   inStockOnly,
   onToggleInStock,
+  sort = "newest",
+  onSortChange,
   onResetFilters,
   activeFilterCount,
   isOpenMobile,
@@ -117,8 +128,9 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
   onAromaChange,
   onApplyFilters,
 }) => {
-  // Accordion open/close state matching Image 2
+  // Accordion open/close state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    sort: false,
     price: true,
     filter: true,
     skinType: false,
@@ -274,6 +286,45 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
                   {isSelected && (
                     <Check className="w-3.5 h-3.5 text-[#B87D4B]" />
                   )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* SORT ORDER ACCORDION */}
+      <div className="py-3">
+        <button
+          type="button"
+          onClick={() => toggleSection("sort")}
+          className="w-full flex items-center justify-between py-1 text-sm font-semibold text-[#211A1C] hover:text-[#B87D4B] transition-colors text-left"
+        >
+          <span className="tracking-wide">Sort order</span>
+          <ChevronDown
+            className={`w-4 h-4 text-[#8A7E81] transition-transform duration-200 ${
+              openSections.sort ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {openSections.sort && (
+          <div className="pt-2 pb-1 space-y-1 animate-in fade-in duration-150">
+            {SORT_OPTIONS.map((item) => {
+              const isSelected = sort === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onSortChange && onSortChange(item.value)}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-[#F7EFE9] text-[#B87D4B] font-bold"
+                      : "text-[#5C5255] hover:bg-[#FAF7F5] hover:text-[#211A1C]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#B87D4B]" />}
                 </button>
               );
             })}
@@ -485,11 +536,11 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
   return (
     <>
       {/* =========================================================================
-          DESKTOP SIDEBAR (Styled exactly as in Screenshot 2)
+          DESKTOP SIDEBAR (Styled exactly as in Screenshot 1, fixed to page)
          ========================================================================= */}
-      <aside className="hidden lg:block w-72 shrink-0 bg-white border border-[#EFE7DE] rounded-2xl shadow-xs sticky top-28 overflow-hidden">
-        {/* Header matching Screenshot 2 */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE7DE] bg-[#FCF9F7]">
+      <aside className="hidden lg:flex flex-col w-72 shrink-0 bg-white border border-[#EFE7DE] rounded-2xl shadow-xs sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-hidden">
+        {/* Header matching Image 1 */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#EFE7DE] bg-[#FCF9F7] shrink-0">
           <h3 className="font-serif-luxury text-base font-semibold text-[#211A1C]">
             Filter by
           </h3>
@@ -500,13 +551,13 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
           )}
         </div>
 
-        {/* Scrollable Accordions */}
-        <div className="px-5 max-h-[calc(100vh-280px)] overflow-y-auto">
+        {/* Scrollable Accordions - Clean, smooth scrolling WITHOUT ugly browser scrollbar */}
+        <div className="px-5 py-2 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {filterAccordionContent}
         </div>
 
-        {/* Bottom Bar: RESET ALL and APPLY > matching Screenshot 2 */}
-        <div className="flex items-center justify-between border-t border-[#EFE7DE] bg-[#FCF9F7] px-5 py-3">
+        {/* Bottom Bar: RESET ALL and APPLY > matching Image 1 */}
+        <div className="flex items-center justify-between border-t border-[#EFE7DE] bg-[#FCF9F7] px-5 py-3.5 shrink-0">
           <button
             type="button"
             onClick={onResetFilters}
@@ -526,7 +577,7 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
       </aside>
 
       {/* =========================================================================
-          MOBILE DRAWER (Exact Screenshot 2 structure with Cancel ✕)
+          MOBILE DRAWER (Exact structure with Cancel ✕)
          ========================================================================= */}
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
@@ -538,7 +589,7 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
 
           {/* Drawer Panel */}
           <div className="relative ml-auto w-full max-w-sm bg-white h-full shadow-2xl flex flex-col z-10">
-            {/* Header: "Filter by" and "Cancel ✕" matching Screenshot 2 */}
+            {/* Header: "Filter by" and "Cancel ✕" */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFE7DE] bg-[#FCF9F7]">
               <h3 className="font-serif-luxury text-lg font-semibold text-[#211A1C]">
                 Filter by
@@ -554,7 +605,7 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 px-5 py-2 overflow-y-auto">
+            <div className="flex-1 px-5 py-2 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {filterAccordionContent}
             </div>
 
