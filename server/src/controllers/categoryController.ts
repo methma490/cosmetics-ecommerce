@@ -14,13 +14,19 @@ import createSlug from "../utils/createSlug.js";
 */
 
 export const getCategories = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const categories = await Category.find({
-      isActive: true,
-    }).sort({
+    const filter: Record<string, unknown> = {};
+
+    if (req.user?.role === "admin" && req.query.includeInactive === "true") {
+      // Admin requested all categories
+    } else {
+      filter.isActive = true;
+    }
+
+    const categories = await Category.find(filter).sort({
       name: 1,
     });
 

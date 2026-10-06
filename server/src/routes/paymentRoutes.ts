@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   initiatePayHerePayment,
   handlePayHereNotification,
+  getPaymentStatus,
 } from "../controllers/paymentController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -47,4 +48,26 @@ router.post(
   handlePayHereNotification
 );
 
-export default router;
+/**
+ * Get payment status
+ *
+ * Protected route to verify payment and order status
+ * after returning from PayHere checkout.
+ *
+ * GET:
+ * /api/payments/:orderId/status
+ */
+router.get(
+  "/:orderId/status",
+  protect,
+  getPaymentStatus
+);
+
+// Alias route for /payhere/:orderId/status
+router.get(
+  "/payhere/:orderId/status",
+  protect,
+  getPaymentStatus
+);
+
+export default router;

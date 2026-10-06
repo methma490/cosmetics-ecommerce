@@ -55,6 +55,13 @@ router.get(
   getAllOrders
 );
 
+router.get(
+  "/",
+  protect,
+  adminOnly,
+  getAllOrders
+);
+
 router.patch(
   "/admin/:id/status",
   protect,
@@ -88,12 +95,6 @@ router.get(
   "/:id/whatsapp",
   protect,
   getWhatsAppOrder
-);
-
-router.get(
-  "/:id",
-  protect,
-  getOrderById
 );
 
 export default router;

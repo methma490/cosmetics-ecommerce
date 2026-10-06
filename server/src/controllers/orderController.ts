@@ -840,21 +840,22 @@ export const getOrderById = async (
 
     if (
       typeof id !== "string" ||
-      !mongoose.Types.ObjectId.isValid(
-        id
-      )
+      !id.trim()
     ) {
       res.status(400).json({
         success: false,
         message:
-          "Invalid order ID",
+          "Invalid order identifier",
       });
 
       return;
     }
 
+    const isObjectId = mongoose.Types.ObjectId.isValid(id);
+    const orderQuery = isObjectId ? { _id: id } : { orderNumber: id.trim() };
+
     const order =
-      await Order.findById(id)
+      await Order.findOne(orderQuery)
         .populate(
           "items.product",
           "name slug images"

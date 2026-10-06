@@ -500,3 +500,82 @@ export const handlePayHereNotification = async (
     res.status(500).send("Internal server error");
   }
 };
+
+/**
+ * =========================================================
+ * GET PAYMENT STATUS BY ORDER ID
+ * =========================================================
+ *
+ * Route:
+ * GET /api/payments/:orderId/status
+ *
+ * Protected route.
+ * Customer can access own order; Admin can access any order.
+ */
+export const getPaymentStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user?.userId;
+    const role = req.user?.role;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      });
+      return;
+    }
+
+    if (
+      typeof orderId !== "string" ||
+      !orderId.trim()
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid order identifier",
+      });
+      return;
+    }
+
+    const isObjectId = mongoose.Types.ObjectId.isValid(orderId);
+    const order = isObjectId
+      ? await Order.findById(orderId)
+      : await Order.findOne({ orderNumber: orderId.trim() });
+
+    if (!order) {
+      res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+      return;
+    }
+
+    if (role !== "admin" && order.user.toString() !== userId) {
+      res.status(403).json({
+        success: false,
+        message: "You are not allowed to access this order",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+      orderStatus: order.orderStatus,
+      total: order.total,
+      currency: "LKR",
+    });
+  } catch (error) {
+    console.error("Get payment status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get payment status",
+    });
+  }
+};

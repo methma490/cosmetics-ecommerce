@@ -88,3 +88,45 @@ export const protect = async (
     next(error);
   }
 };
+
+export const optionalAuth = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const token = req.cookies?.[AUTH_COOKIE_NAME] as
+      | string
+      | undefined;
+
+    if (!token) {
+      next();
+      return;
+    }
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      next();
+      return;
+    }
+
+    const decoded = jwt.verify(
+      token,
+      jwtSecret
+    ) as JwtPayload;
+
+    const user = await User.findById(decoded.userId);
+
+    if (user && user.isActive) {
+      req.user = {
+        userId: user._id.toString(),
+        role: user.role,
+      };
+    }
+
+    next();
+  } catch {
+    // If token is invalid or expired, continue as unauthenticated guest
+    next();
+  }
+};

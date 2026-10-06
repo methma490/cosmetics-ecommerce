@@ -65,9 +65,15 @@ export const getProducts = async (
     |--------------------------------------------------------------------------
     */
 
-    const filter: Record<string, unknown> = {
-      isActive: true,
-    };
+    const filter: Record<string, unknown> = {};
+
+    if (req.user?.role === "admin" && req.query.includeInactive === "true") {
+      // Admin requested all products (active and inactive)
+    } else if (req.user?.role === "admin" && req.query.isActive !== undefined) {
+      filter.isActive = req.query.isActive === "true";
+    } else {
+      filter.isActive = true;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -355,10 +361,16 @@ export const getProductBySlug = async (
       return;
     }
 
-    const product = await Product.findOne({
-      slug: slug.toLowerCase(),
-      isActive: true,
-    }).populate(
+    const isObjectId = mongoose.Types.ObjectId.isValid(slug);
+    const query: Record<string, unknown> = isObjectId
+      ? { $or: [{ _id: slug }, { slug: slug.toLowerCase() }] }
+      : { slug: slug.toLowerCase() };
+
+    if (req.user?.role !== "admin") {
+      query.isActive = true;
+    }
+
+    const product = await Product.findOne(query).populate(
       "category",
       "name slug"
     );

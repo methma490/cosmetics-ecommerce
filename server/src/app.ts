@@ -12,6 +12,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -147,21 +148,6 @@ app.use(
  * Keep this LAST.
  */
 
-app.use(
-  (
-    error: Error,
-    _req: Request,
-    res: Response,
-    _next: NextFunction
-  ) => {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message:
-        "Internal server error",
-    });
-  }
-);
+app.use(errorHandler);
 
 export default app;

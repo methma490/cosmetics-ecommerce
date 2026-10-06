@@ -8,24 +8,26 @@ import {
   updateProduct,
 } from "../controllers/productController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, optionalAuth } from "../middleware/authMiddleware.js";
 import { adminOnly } from "../middleware/adminMiddleware.js";
 
 const router = Router();
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| Public (with optional auth for admin context)
 |--------------------------------------------------------------------------
 */
 
 router.get(
   "/",
+  optionalAuth,
   getProducts
 );
 
 router.get(
   "/:slug",
+  optionalAuth,
   getProductBySlug
 );
 
