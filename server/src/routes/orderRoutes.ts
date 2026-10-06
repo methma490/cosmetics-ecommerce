@@ -5,6 +5,7 @@ import {
   getAllOrders,
   getMyOrders,
   getOrderById,
+  getWhatsAppOrder,
   updateOrderStatus,
   updatePaymentStatus,
 } from "../controllers/orderController.js";
@@ -76,6 +77,18 @@ router.patch(
 | Must stay after specific routes like /admin/all.
 |--------------------------------------------------------------------------
 */
+
+router.get(
+  "/:id",
+  protect,
+  getOrderById
+);
+
+router.get(
+  "/:id/whatsapp",
+  protect,
+  getWhatsAppOrder
+);
 
 router.get(
   "/:id",

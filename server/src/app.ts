@@ -11,9 +11,15 @@ import authRoutes from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 const app = express();
 
+/**
+ * =========================================================
+ * CORS
+ * =========================================================
+ */
 app.use(
   cors({
     origin:
@@ -24,15 +30,37 @@ app.use(
   })
 );
 
+/**
+ * =========================================================
+ * BODY PARSERS
+ * =========================================================
+ */
+
+// Parse JSON requests
 app.use(express.json());
 
+// IMPORTANT:
+// PayHere notify callback sends
+// application/x-www-form-urlencoded data
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
 
+/**
+ * =========================================================
+ * COOKIE PARSER
+ * =========================================================
+ */
+
 app.use(cookieParser());
+
+/**
+ * =========================================================
+ * BASIC ROUTES
+ * =========================================================
+ */
 
 app.get(
   "/",
@@ -55,25 +83,52 @@ app.get(
   }
 );
 
+/**
+ * =========================================================
+ * API ROUTES
+ * =========================================================
+ */
+
+// Authentication
 app.use(
   "/api/auth",
   authRoutes
 );
 
+// Categories
 app.use(
   "/api/categories",
   categoryRoutes
 );
 
+// Products
 app.use(
   "/api/products",
   productRoutes
 );
 
+// Orders
 app.use(
   "/api/orders",
   orderRoutes
 );
+
+// PayHere payments
+// IMPORTANT:
+// This MUST be before the 404 handler.
+app.use(
+  "/api/payments",
+  paymentRoutes
+);
+
+/**
+ * =========================================================
+ * 404 - ROUTE NOT FOUND
+ * =========================================================
+ *
+ * IMPORTANT:
+ * Keep this AFTER all API routes.
+ */
 
 app.use(
   (_req: Request, res: Response) => {
@@ -83,6 +138,14 @@ app.use(
     });
   }
 );
+
+/**
+ * =========================================================
+ * GLOBAL ERROR HANDLER
+ * =========================================================
+ *
+ * Keep this LAST.
+ */
 
 app.use(
   (
