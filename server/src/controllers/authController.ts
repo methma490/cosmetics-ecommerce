@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import User from "../models/user.js";
 import UserProfile from "../models/userProfile.js";
+import Cart from "../models/cart.js";
 
 import generateToken from "../utils/generateToken.js";
 
@@ -797,7 +798,10 @@ export const deleteMyAccount = async (
     // 2. Delete user profile from database (UserProfile model)
     await UserProfile.deleteMany({ user: userId });
 
-    // 3. Clear authentication cookie
+    // 3. Delete customer cart from database (Cart model)
+    await Cart.deleteMany({ user: userId });
+
+    // 4. Clear authentication cookie
     clearAuthCookie(res);
 
     res.status(200).json({

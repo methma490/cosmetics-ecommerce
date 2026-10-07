@@ -12,6 +12,7 @@ import Order, {
 } from "../models/order.js";
 
 import Product from "../models/product.js";
+import Cart from "../models/cart.js";
 
 import generateOrderNumber from "../utils/generateOrderNumber.js";
 
@@ -721,6 +722,9 @@ export const createOrder = async (
         inventoryDeducted:
           false,
       });
+
+    // Clear user's database cart upon order creation
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
     /*
     |--------------------------------------------------------------------------

@@ -13,6 +13,7 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -144,6 +145,12 @@ app.use(
 app.use(
   "/api/upload",
   uploadRoutes
+);
+
+// Customer Cart (Stored per customer in database)
+app.use(
+  "/api/cart",
+  cartRoutes
 );
 
 /**
