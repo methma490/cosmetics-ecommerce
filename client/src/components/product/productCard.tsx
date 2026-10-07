@@ -17,7 +17,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const primaryImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80";
+      : "/images/placeholders/product-placeholder.jpg";
 
   const secondaryImage =
     product.images && product.images.length > 1
@@ -60,6 +60,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={product.name}
           className="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-105"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+          }}
         />
 
         {/* Alternate Image on Hover if available */}
@@ -69,6 +73,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alt={`${product.name} editorial angle`}
             className="w-full h-full object-cover object-center absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+            }}
           />
         )}
 

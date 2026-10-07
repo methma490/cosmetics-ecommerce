@@ -425,10 +425,16 @@ export const ShopPage: React.FC = () => {
                 </button>
               </div>
             )}
-            {displayedProducts.length > 0 ? (
+            {loading ? (
+              <ProductGrid
+                products={[]}
+                loading={true}
+                onClearFilters={handleResetFilters}
+              />
+            ) : displayedProducts.length > 0 ? (
               <ProductGrid
                 products={displayedProducts}
-                loading={loading}
+                loading={false}
                 onClearFilters={handleResetFilters}
               />
             ) : (

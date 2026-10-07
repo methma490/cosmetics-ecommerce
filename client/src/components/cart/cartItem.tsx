@@ -17,7 +17,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item, onItemClick }) => {
   const image =
     product.images && product.images.length > 0
       ? product.images[0]
-      : "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=400&q=80";
+      : "/images/placeholders/product-placeholder.jpg";
 
   const categoryName =
     typeof product.category === "object" && product.category !== null
@@ -37,6 +37,10 @@ export const CartItem: React.FC<CartItemProps> = ({ item, onItemClick }) => {
           alt={product.name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+          }}
         />
       </Link>
 

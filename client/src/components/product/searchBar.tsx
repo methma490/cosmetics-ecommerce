@@ -117,7 +117,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               {results.map((product) => {
                 const img =
                   product.images?.[0] ||
-                  "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=80";
+                  "/images/placeholders/product-placeholder.jpg";
                 return (
                   <Link
                     key={product._id}
@@ -133,6 +133,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                       src={img}
                       alt={product.name}
                       className="w-10 h-12 object-cover rounded-md bg-[#F7EFE9] border border-[#F0DFD8]"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-[#211A1C] truncate">

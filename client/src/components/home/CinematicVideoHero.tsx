@@ -39,7 +39,7 @@ export const HERO_SCENES: HeroScene[] = [
     videoSrc: "/videos/luxury-serum-dropper.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-MzMzhNLHP3yP/1080p.mp4",
     posterSrc: "/videos/luxury-serum-dropper-poster.jpg",
-    productImage: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
+    productImage: "/images/hero/serum-dropper.jpg",
     keyActives: ["Niacinamide 5%", "Botanical Squalane", "24K Golden Actives"],
   },
   {
@@ -54,7 +54,7 @@ export const HERO_SCENES: HeroScene[] = [
     videoSrc: "/videos/crystal-perfume-bottle.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-YTy6BsKIEgr9/1080p.mp4",
     posterSrc: "/videos/crystal-perfume-bottle-poster.jpg",
-    productImage: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80",
+    productImage: "/images/hero/crystal-fragrance.jpg",
     keyActives: ["French Peony Extract", "Calabrian Bergamot", "Sandalwood Essence"],
   },
   {
@@ -69,7 +69,7 @@ export const HERO_SCENES: HeroScene[] = [
     videoSrc: "/videos/skincare-serum-bottle.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-0IwhHACz2N6l/1080p.mp4",
     posterSrc: "/videos/skincare-serum-bottle-poster.jpg",
-    productImage: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=600&q=80",
+    productImage: "/images/hero/velvet-rose.jpg",
     keyActives: ["Damask Rose Water", "Triple Ceramides", "Hyaluronic Acid"],
   },
 ];
@@ -345,6 +345,10 @@ export const CinematicVideoHero: React.FC = () => {
                     src={activeScene.productImage}
                     alt={activeScene.productName}
                     className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-1 right-1 p-1 rounded-full bg-black/60 text-[#FFF1A8]">

@@ -278,7 +278,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   type="url"
                   value={imgUrl}
                   onChange={(e) => handleImageChange(idx, e.target.value)}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  placeholder="https://res.cloudinary.com/... or /images/..."
                   className="flex-1 px-3.5 py-2 rounded-xl border border-[#F0DFD8] text-xs text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
                 />
                 {imgUrl && (
@@ -286,6 +286,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     src={imgUrl}
                     alt="Preview"
                     className="w-9 h-9 rounded-lg object-cover bg-[#F7EFE9] border border-[#F0DFD8]"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                    }}
                   />
                 )}
                 <button

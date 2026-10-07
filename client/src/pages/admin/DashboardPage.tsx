@@ -297,9 +297,13 @@ const DashboardPage: React.FC = () => {
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <img 
-                        src={prod.images?.[0] || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=150&q=80'} 
+                        src={prod.images?.[0] || '/images/placeholders/product-placeholder.jpg'} 
                         alt={prod.name}
                         className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = '/images/placeholders/product-placeholder.jpg';
+                        }}
                       />
                       <div className="min-w-0">
                         <h4 className="text-xs font-semibold text-[#211A1C] truncate">{prod.name}</h4>

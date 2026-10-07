@@ -52,8 +52,7 @@ const SHOWCASE_ITEMS: ProductVideoItem[] = [
     videoSrc: "/videos/luxury-serum-dropper.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-MzMzhNLHP3yP/1080p.mp4",
     posterSrc: "/videos/luxury-serum-dropper-poster.jpg",
-    productImage:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+    productImage: "/images/showcase/serum-showcase.jpg",
     actives: [
       { name: "Niacinamide 5%", benefit: "Refines pores & balances natural sebum" },
       { name: "Botanical Squalane", benefit: "Deep lipid barrier restoration" },
@@ -76,8 +75,7 @@ const SHOWCASE_ITEMS: ProductVideoItem[] = [
     videoSrc: "/videos/crystal-perfume-bottle.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-YTy6BsKIEgr9/1080p.mp4",
     posterSrc: "/videos/crystal-perfume-bottle-poster.jpg",
-    productImage:
-      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+    productImage: "/images/showcase/fragrance-showcase.jpg",
     actives: [
       { name: "French Peony Petals", benefit: "Delicate and luminous floral bouquet" },
       { name: "Calabrian Bergamot", benefit: "Crisp and uplifting citrus top notes" },
@@ -100,8 +98,7 @@ const SHOWCASE_ITEMS: ProductVideoItem[] = [
     videoSrc: "/videos/skincare-serum-bottle.mp4",
     altVideoSrc: "https://cdn.coverr.co/videos/user-ai-generation-0IwhHACz2N6l/1080p.mp4",
     posterSrc: "/videos/skincare-serum-bottle-poster.jpg",
-    productImage:
-      "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+    productImage: "/images/showcase/cream-showcase.jpg",
     actives: [
       { name: "Damask Rose Distillate", benefit: "Soothes redness and restores pH" },
       { name: "Triple Ceramides (NP, AP, EOP)", benefit: "Reinforces delicate lipid barrier" },

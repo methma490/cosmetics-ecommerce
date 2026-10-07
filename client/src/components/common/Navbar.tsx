@@ -98,7 +98,7 @@ const MEGA_MENUS: Record<string, MegaMenuConfig> = {
       tag: "Women's Atelier",
       title: "Botanical Radiance Serum",
       desc: "Niacinamide 5% & golden active peptides for an effortless daily glow.",
-      image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
+      image: "/images/navbar/featured-women.jpg",
       href: "/shop?category=skincare",
     },
   },
@@ -148,7 +148,7 @@ const MEGA_MENUS: Record<string, MegaMenuConfig> = {
       tag: "Men's Grooming",
       title: "Woody Bergamot Cologne",
       desc: "Crisp Italian citrus fused with warm Virginia cedarwood.",
-      image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80",
+      image: "/images/navbar/featured-men.jpg",
       href: "/shop?category=fragrance",
     },
   },
@@ -200,7 +200,7 @@ const MEGA_MENUS: Record<string, MegaMenuConfig> = {
       tag: "Couture Lips",
       title: "Silk Petal Matte Lipstick",
       desc: "Rich botanical pigment infused with organic shea butter.",
-      image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
+      image: "/images/navbar/featured-makeup.jpg",
       href: "/shop?category=makeup",
     },
   },
@@ -270,7 +270,7 @@ const MEGA_MENUS: Record<string, MegaMenuConfig> = {
       tag: "Master Perfumer",
       title: "Maison Fleur Eau De Parfum",
       desc: "French peony, bergamot & Mysore sandalwood in a crystal flacon.",
-      image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80",
+      image: "/images/navbar/featured-fragrance.jpg",
       href: "/shop?category=fragrance",
     },
   },
@@ -545,9 +545,13 @@ export const Navbar: React.FC = () => {
                           className="flex items-center gap-3.5 p-3 hover:bg-[#F7EFE9]/60 transition-colors group"
                         >
                           <img
-                            src={prod.images?.[0] || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=80"}
+                            src={prod.images?.[0] || "/images/placeholders/product-placeholder.jpg"}
                             alt={prod.name}
                             className="w-12 h-12 rounded-xl object-cover border border-[#EFE6DF] group-hover:scale-105 transition-transform"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                            }}
                           />
                           <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-semibold text-[#211A1C] group-hover:text-[#B87D4B] truncate">
@@ -966,6 +970,10 @@ export const Navbar: React.FC = () => {
                             src={MEGA_MENUS[activeMegaMenu].featuredCard?.image}
                             alt="Featured Formulation"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                            }}
                           />
                         </div>
                         <span className="text-[10px] uppercase tracking-wider text-[#8F6B00] font-bold block mb-1">

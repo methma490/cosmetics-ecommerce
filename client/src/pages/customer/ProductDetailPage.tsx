@@ -46,7 +46,7 @@ export const ProductDetailPage: React.FC = () => {
           setProduct(data.product);
           setSelectedImage(
             data.product.images?.[0] ||
-              "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80"
+              "/images/placeholders/product-placeholder.jpg"
           );
           setQuantity(1);
 
@@ -181,7 +181,15 @@ export const ProductDetailPage: React.FC = () => {
                       : "border-[#F0DFD8] opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <img src={img} alt={`${product.name} thumb ${i}`} className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt={`${product.name} thumb ${i}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -193,6 +201,10 @@ export const ProductDetailPage: React.FC = () => {
               src={selectedImage}
               alt={product.name}
               className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+              }}
             />
             {isOutOfStock && (
               <div className="absolute inset-0 bg-[#211A1C]/60 backdrop-blur-xs flex items-center justify-center">

@@ -62,20 +62,13 @@ export const HomePage: React.FC = () => {
   };
 
   const categoryImages: Record<string, string> = {
-    skincare:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
-    "skin-care":
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80",
-    makeup:
-      "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
-    fragrance:
-      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80",
-    "hair-care":
-      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=80",
-    "body-care":
-      "https://images.unsplash.com/photo-1556228722-d0b71e16f391?auto=format&fit=crop&w=600&q=80",
-    "sun-care":
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80",
+    skincare: "/images/categories/skincare.jpg",
+    "skin-care": "/images/categories/skincare.jpg",
+    makeup: "/images/categories/makeup.jpg",
+    fragrance: "/images/categories/fragrance.jpg",
+    "hair-care": "/images/categories/haircare.jpg",
+    "body-care": "/images/categories/bodycare.jpg",
+    "sun-care": "/images/categories/suncare.jpg",
   };
 
   return (
@@ -107,7 +100,7 @@ export const HomePage: React.FC = () => {
           {categories.map((cat) => {
             const img =
               categoryImages[cat.slug] ||
-              "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80";
+              "/images/categories/default.jpg";
 
             return (
               <Link
@@ -120,6 +113,10 @@ export const HomePage: React.FC = () => {
                   alt={cat.name}
                   className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700"
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "/images/categories/default.jpg";
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#211A1C]/85 via-[#211A1C]/25 to-transparent group-hover:from-[#B87D4B]/85 transition-colors duration-500" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
@@ -184,10 +181,14 @@ export const HomePage: React.FC = () => {
           <div className="lg:col-span-6 relative">
             <div className="aspect-4/3 rounded-3xl overflow-hidden shadow-2xl border border-[#F0DFD8] group">
               <img
-                src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1200&q=85"
+                src="/images/editorial/botanical-alchemy.jpg"
                 alt="AURA Botanical Formulation Alchemy"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/images/categories/default.jpg";
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             </div>

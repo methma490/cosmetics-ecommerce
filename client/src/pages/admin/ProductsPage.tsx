@@ -209,7 +209,7 @@ export const ProductsPage: React.FC = () => {
 
                   const img =
                     p.images?.[0] ||
-                    "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100&q=80";
+                    "/images/placeholders/product-placeholder.jpg";
 
                   return (
                     <tr key={p._id} className="hover:bg-[#FFF9F5]/70 transition-colors">
@@ -219,6 +219,10 @@ export const ProductsPage: React.FC = () => {
                             src={img}
                             alt={p.name}
                             className="w-10 h-12 object-cover rounded-lg bg-[#FBECEF] border border-[#E8DADD]/40 flex-shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                            }}
                           />
                           <div>
                             <p className="font-semibold text-[#252223] truncate max-w-xs">

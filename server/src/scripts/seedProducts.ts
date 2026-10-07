@@ -44,8 +44,7 @@ const productsData = [
     description:
       "A revitalizing face serum infused with botanical antioxidants, niacinamide, and hyaluronic acid. Restores natural skin glow and deeply hydrates without heaviness.",
     images: [
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1608248597359-0a6932598379?auto=format&fit=crop&w=800&q=80",
+      "/images/products/serum-radiance.jpg",
     ],
   },
   {
@@ -57,7 +56,7 @@ const productsData = [
     description:
       "Ultra-hydrating daily moisturizer packed with Damask rose water and ceramides. Shields the skin barrier and leaves a velvety, soft-matte finish.",
     images: [
-      "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
+      "/images/products/velvet-rose-cream.jpg",
     ],
   },
   {
@@ -69,7 +68,7 @@ const productsData = [
     description:
       "Mild, sulfate-free cleanser that purifies impurities while maintaining optimal skin moisture balance. Enriched with chamomile and green tea extract.",
     images: [
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
+      "/images/products/foaming-cleanser.jpg",
     ],
   },
   {
@@ -81,7 +80,7 @@ const productsData = [
     description:
       "Long-wearing, weightless lipstick infused with shea butter and vitamin E. Delivers rich rose-tinted pigment in a single stroke with unmatched comfort.",
     images: [
-      "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=800&q=80",
+      "/images/products/satin-lipstick.jpg",
     ],
   },
   {
@@ -93,7 +92,7 @@ const productsData = [
     description:
       "A multi-dimensional liquid illuminator that catches light seamlessly. Blends effortlessly on high points of the face or mixed with foundation.",
     images: [
-      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80",
+      "/images/products/liquid-highlighter.jpg",
     ],
   },
   {
@@ -105,7 +104,7 @@ const productsData = [
     description:
       "Nine velvety neutral, rose-gold, and deep plum shades formulated with finely-milled mineral pigments. Silky blendability with zero fallout.",
     images: [
-      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80",
+      "/images/products/eyeshadow-palette.jpg",
     ],
   },
   {
@@ -117,7 +116,7 @@ const productsData = [
     description:
       "An evocative fragrance featuring notes of French peony, crisp bergamot, creamy sandalwood, and white musk. Sophisticated and memorable for everyday luxury.",
     images: [
-      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80",
+      "/images/products/maison-fleur-parfum.jpg",
     ],
   },
   {
@@ -129,7 +128,7 @@ const productsData = [
     description:
       "Concentrated rollerball perfume oil with rich amber, vanilla orchid, and spicy pink pepper. Melts into warm skin for long-lasting, intimate sillage.",
     images: [
-      "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=800&q=80",
+      "/images/products/amber-twilight-oil.jpg",
     ],
   },
   {
@@ -141,7 +140,7 @@ const productsData = [
     description:
       "Weightless Moroccan argan oil treatment that tames frizz, protects against heat styling, and restores natural mirror-like shine.",
     images: [
-      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=800&q=80",
+      "/images/products/hair-elixir.jpg",
     ],
   },
   {
@@ -153,7 +152,7 @@ const productsData = [
     description:
       "Deep conditioning weekly treatment that fortifies distressed strands with plant keratin, cold-pressed marula oil, and amino acids.",
     images: [
-      "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800&q=80",
+      "/images/products/hair-mask.jpg",
     ],
   },
   {
@@ -165,7 +164,7 @@ const productsData = [
     description:
       "Whipped, deeply replenishing body cream that melts instantly into the skin. Delivers 48-hour moisture with an intoxicating subtle almond scent.",
     images: [
-      "https://images.unsplash.com/photo-1556228722-d0b71e16f391?auto=format&fit=crop&w=800&q=80",
+      "/images/products/body-souffle.jpg",
     ],
   },
   {
@@ -177,7 +176,7 @@ const productsData = [
     description:
       "Mineral-rich crystalline body scrub with crushed rose petals and sweet almond oil. Gently buffs away dead skin cells to reveal radiant silkiness.",
     images: [
-      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80",
+      "/images/products/body-polish.jpg",
     ],
   },
 ];

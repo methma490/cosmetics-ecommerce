@@ -116,12 +116,33 @@ export const getProducts = async (
       typeof category === "string" &&
       category.trim()
     ) {
-      const categoryDocument = await Category.findOne({
-        slug: category.trim().toLowerCase(),
-        isActive: true,
-      });
+      const catTrimmed = category.trim();
+      let matchedCategoryIds: mongoose.Types.ObjectId[] = [];
 
-      if (!categoryDocument) {
+      if (mongoose.Types.ObjectId.isValid(catTrimmed)) {
+        const byId = await Category.findOne({
+          _id: catTrimmed,
+          isActive: true,
+        });
+        if (byId) matchedCategoryIds.push(byId._id);
+      }
+
+      if (matchedCategoryIds.length === 0) {
+        const normalized = catTrimmed.toLowerCase().replace(/[\s_]+/g, "-");
+        const isSkin = normalized === "skincare" || normalized === "skin-care";
+        const querySlugs = isSkin ? ["skin-care", "skincare"] : [normalized, catTrimmed.toLowerCase()];
+
+        const matchedCats = await Category.find({
+          $or: [
+            { slug: { $in: querySlugs }, isActive: true },
+            { name: { $regex: `^${catTrimmed}$`, $options: "i" }, isActive: true },
+          ],
+        });
+
+        matchedCategoryIds = matchedCats.map((c) => c._id);
+      }
+
+      if (matchedCategoryIds.length === 0) {
         res.status(200).json({
           success: true,
           count: 0,
@@ -133,7 +154,11 @@ export const getProducts = async (
         return;
       }
 
-      filter.category = categoryDocument._id;
+      if (matchedCategoryIds.length === 1) {
+        filter.category = matchedCategoryIds[0];
+      } else {
+        filter.category = { $in: matchedCategoryIds };
+      }
     }
 
     /*
@@ -694,7 +719,7 @@ export const createProduct = async (
       ).populate(
         "category",
         "name slug"
-      );
+      )
 
     res.status(201).json({
       success: true,
