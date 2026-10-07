@@ -24,60 +24,97 @@ export const PaymentStatusPage: React.FC<PaymentStatusPageProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [pollCount, setPollCount] = useState<number>(0);
 
-  useEffect(() => {
-    if (!orderId) {
+useEffect(() => {
+  // No order ID: nothing needs to be checked.
+  // The component already renders the missing-order UI below.
+  if (!orderId) {
+    return;
+  }
+
+  let intervalId: ReturnType<typeof setInterval> | undefined;
+  let cancelled = false;
+  let attempts = 0;
+
+  const checkStatus = async (): Promise<boolean> => {
+    try {
+      const res = await paymentService.getPaymentStatus(orderId);
+
+      // Prevent state updates after unmount / route change
+      if (cancelled) {
+        return false;
+      }
+
+      if (res.success) {
+        setPaymentData(res);
+
+        if (res.paymentStatus === "paid") {
+          setLoading(false);
+          return true;
+        }
+      }
+    } catch (err: unknown) {
+      console.error("Payment status check error:", err);
+    }
+
+    return false;
+  };
+
+  const startChecking = async () => {
+    const isPaid = await checkStatus();
+
+    if (cancelled) {
+      return;
+    }
+
+    // No polling needed for cancelled payment flow
+    if (isPaid || statusType !== "success") {
       setLoading(false);
       return;
     }
 
-    let intervalId: ReturnType<typeof setInterval>;
+    // PayHere webhook may arrive slightly after redirect,
+    // so poll the backend every 3 seconds.
+    intervalId = setInterval(async () => {
+      attempts += 1;
 
-    const checkStatus = async () => {
-      try {
-        const res = await paymentService.getPaymentStatus(orderId);
-        if (res.success) {
-          setPaymentData(res);
+      if (cancelled) {
+        return;
+      }
 
-          // If payment verified as paid, stop polling
-          if (res.paymentStatus === "paid") {
-            setLoading(false);
-            return true;
-          }
+      setPollCount(attempts);
+
+      const paid = await checkStatus();
+
+      if (paid) {
+        if (intervalId) {
+          clearInterval(intervalId);
         }
-      } catch (err: unknown) {
-        console.error("Payment status check error:", err);
+        return;
       }
-      return false;
-    };
 
-    // Immediate check
-    void checkStatus().then((isPaid) => {
-      if (!isPaid && statusType === "success") {
-        // Poll every 3 seconds up to 5 times to await webhook callback verification
-        intervalId = setInterval(async () => {
-          setPollCount((prev) => {
-            if (prev >= 4) {
-              clearInterval(intervalId);
-              setLoading(false);
-              return prev;
-            }
-            return prev + 1;
-          });
+      // Initial request + 4 additional polling attempts = 5 checks
+      if (attempts >= 4) {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
 
-          const paid = await checkStatus();
-          if (paid) {
-            clearInterval(intervalId);
-          }
-        }, 3000);
-      } else {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-    });
+    }, 3000);
+  };
 
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [orderId, statusType]);
+  void startChecking();
+
+  return () => {
+    cancelled = true;
+
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+  };
+}, [orderId, statusType]);
 
   if (!orderId) {
     return (

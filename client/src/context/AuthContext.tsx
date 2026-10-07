@@ -32,7 +32,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem("aura_user");
+      const token = localStorage.getItem("aura_token");
+      if (savedUser && token) {
+        return JSON.parse(savedUser) as User;
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return null;
+  });
   const [loading, setLoading] = useState<boolean>(true);
 
   const refreshUser = useCallback(async () => {
@@ -40,11 +51,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await authService.getMe();
       if (data.success && data.user) {
         setUser(data.user);
+        localStorage.setItem("aura_user", JSON.stringify(data.user));
       } else {
         setUser(null);
+        localStorage.removeItem("aura_token");
+        localStorage.removeItem("aura_user");
       }
     } catch {
       setUser(null);
+      localStorage.removeItem("aura_token");
+      localStorage.removeItem("aura_user");
     } finally {
       setLoading(false);
     }
@@ -56,7 +72,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (credentials: LoginCredentials): Promise<User> => {
     const data = await authService.login(credentials);
+    if (!data.user) {
+      throw new Error(data.message || "Failed to log in");
+    }
+    if (data.token) {
+      localStorage.setItem("aura_token", data.token);
+    }
     setUser(data.user);
+    localStorage.setItem("aura_user", JSON.stringify(data.user));
     return data.user;
   };
 
@@ -66,7 +89,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const verifyEmail = async (email: string, code: string): Promise<User> => {
     const response = await authService.verifyEmail(email, code);
+    if (response.token) {
+      localStorage.setItem("aura_token", response.token);
+    }
     setUser(response.user);
+    localStorage.setItem("aura_user", JSON.stringify(response.user));
     return response.user;
   };
 
@@ -80,6 +107,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await authService.logout();
     } finally {
+      localStorage.removeItem("aura_token");
+      localStorage.removeItem("aura_user");
       setUser(null);
     }
   };
@@ -88,6 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await authService.deleteAccount();
     } finally {
+      localStorage.removeItem("aura_token");
+      localStorage.removeItem("aura_user");
       setUser(null);
     }
   };

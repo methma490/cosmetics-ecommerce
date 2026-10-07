@@ -8,21 +8,28 @@ import { useLocation } from "react-router-dom";
  */
 export const NavigationProgressBar: React.FC = () => {
   const location = useLocation();
+
   const [progress, setProgress] = useState<number>(0);
   const [visible, setVisible] = useState<boolean>(false);
+
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clearAllTimeouts = () => {
-    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current.forEach((timeout) => {
+      clearTimeout(timeout);
+    });
+
     timeoutsRef.current = [];
   };
 
   useEffect(() => {
     clearAllTimeouts();
 
-    // Start progress immediately on route change
-    setVisible(true);
-    setProgress(25);
+    // Start asynchronously to avoid synchronous state updates inside effect
+    const start = setTimeout(() => {
+      setVisible(true);
+      setProgress(25);
+    }, 0);
 
     const t1 = setTimeout(() => {
       setProgress(55);
@@ -41,14 +48,16 @@ export const NavigationProgressBar: React.FC = () => {
       setProgress(0);
     }, 600);
 
-    timeoutsRef.current = [t1, t2, t3, t4];
+    timeoutsRef.current = [start, t1, t2, t3, t4];
 
     return () => {
       clearAllTimeouts();
     };
   }, [location.pathname, location.search]);
 
-  if (!visible && progress === 0) return null;
+  if (!visible && progress === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -59,12 +68,25 @@ export const NavigationProgressBar: React.FC = () => {
       aria-valuemax={100}
     >
       <div
-        className="h-full bg-gradient-to-r from-[#D4AF37] via-[#FFF1A8] to-[#B87D4B] transition-all duration-300 ease-out shadow-[0_0_12px_rgba(212,175,55,0.7)]"
+        className="
+          h-full
+          bg-gradient-to-r
+          from-[#D4AF37]
+          via-[#FFF1A8]
+          to-[#B87D4B]
+          transition-all
+          duration-300
+          ease-out
+          shadow-[0_0_12px_rgba(212,175,55,0.7)]
+        "
         style={{
           width: `${progress}%`,
           opacity: visible ? 1 : 0,
           transitionProperty: "width, opacity",
-          transitionDuration: progress === 100 ? "150ms, 250ms" : "300ms, 150ms",
+          transitionDuration:
+            progress === 100
+              ? "150ms, 250ms"
+              : "300ms, 150ms",
         }}
       />
     </div>

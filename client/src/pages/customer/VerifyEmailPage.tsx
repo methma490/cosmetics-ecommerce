@@ -102,6 +102,11 @@ export const VerifyEmailPage: React.FC = () => {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error("Please provide a valid email address.");
+      return;
+    }
+
     if (code.length < 6) {
       toast.error("Please enter the complete 6-digit verification code.");
       return;

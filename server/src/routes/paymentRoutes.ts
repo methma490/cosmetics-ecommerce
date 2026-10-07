@@ -6,7 +6,7 @@ import {
   getPaymentStatus,
 } from "../controllers/paymentController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
@@ -27,7 +27,7 @@ const router = Router();
  */
 router.post(
   "/payhere/initiate/:orderId",
-  protect,
+  optionalAuth,
   initiatePayHerePayment
 );
 
@@ -59,14 +59,14 @@ router.post(
  */
 router.get(
   "/:orderId/status",
-  protect,
+  optionalAuth,
   getPaymentStatus
 );
 
 // Alias route for /payhere/:orderId/status
 router.get(
   "/payhere/:orderId/status",
-  protect,
+  optionalAuth,
   getPaymentStatus
 );
 

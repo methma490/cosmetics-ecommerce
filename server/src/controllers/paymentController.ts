@@ -34,13 +34,7 @@ export const initiatePayHerePayment = async (
     const userId = req.user?.userId;
     const role = req.user?.role;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-      });
-      return;
-    }
+    // userId is optional: allows guests to initiate PayHere payment for guest orders
 
     if (
       typeof orderId !== "string" ||
@@ -63,8 +57,9 @@ export const initiatePayHerePayment = async (
       return;
     }
 
-    // Customer can only pay for their own order.
+    // Customer can only pay for their own order (if order has an assigned user)
     if (
+      order.user &&
       role !== "admin" &&
       order.user.toString() !== userId
     ) {
@@ -521,13 +516,7 @@ export const getPaymentStatus = async (
     const userId = req.user?.userId;
     const role = req.user?.role;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-      });
-      return;
-    }
+    // userId is optional: allows guest order status queries
 
     if (
       typeof orderId !== "string" ||
@@ -553,7 +542,11 @@ export const getPaymentStatus = async (
       return;
     }
 
-    if (role !== "admin" && order.user.toString() !== userId) {
+    if (
+      order.user &&
+      role !== "admin" &&
+      order.user.toString() !== userId
+    ) {
       res.status(403).json({
         success: false,
         message: "You are not allowed to access this order",

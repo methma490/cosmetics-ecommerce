@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
@@ -10,16 +10,66 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Validation State
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
+  const validateField = (name: string, value: string): string => {
+    const val = value.trim();
+    if (name === "email") {
+      if (!val) return "Email address is required";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        return "Please enter a valid email address (e.g. name@domain.com)";
+      }
+      return "";
+    }
+    if (name === "password") {
+      if (!value) return "Password is required";
+      if (value.length < 6) return "Password must be at least 6 characters";
+      return "";
+    }
+    return "";
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const errorMsg = validateField(field, field === "email" ? email : password);
+    setErrors((prev) => ({ ...prev, [field]: errorMsg }));
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmail(val);
+    if (touched.email) {
+      setErrors((prev) => ({ ...prev, email: validateField("email", val) }));
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setPassword(val);
+    if (touched.password) {
+      setErrors((prev) => ({ ...prev, password: validateField("password", val) }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      toast.error("Please provide both email and password.");
+
+    const emailErr = validateField("email", email);
+    const passErr = validateField("password", password);
+
+    setTouched({ email: true, password: true });
+    setErrors({ email: emailErr, password: passErr });
+
+    if (emailErr || passErr) {
+      toast.error("Please provide valid login credentials.");
       return;
     }
 
@@ -84,7 +134,7 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
             <label className="block text-xs font-medium text-[#211A1C] mb-1.5">
               Email Address
@@ -93,13 +143,23 @@ export const LoginPage: React.FC = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                onChange={handleEmailChange}
+                onBlur={() => handleBlur("email")}
                 placeholder="name@example.com"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.email && errors.email
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               />
               <Mail className="w-4 h-4 text-[#756D70] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
+            {touched.email && errors.email && (
+              <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                <span>{errors.email}</span>
+              </p>
+            )}
           </div>
 
           <div>
@@ -110,10 +170,14 @@ export const LoginPage: React.FC = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                onChange={handlePasswordChange}
+                onBlur={() => handleBlur("password")}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
+                className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.password && errors.password
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               />
               <Lock className="w-4 h-4 text-[#756D70] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <button
@@ -129,6 +193,12 @@ export const LoginPage: React.FC = () => {
                 )}
               </button>
             </div>
+            {touched.password && errors.password && (
+              <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                <span>{errors.password}</span>
+              </p>
+            )}
           </div>
 
           <button

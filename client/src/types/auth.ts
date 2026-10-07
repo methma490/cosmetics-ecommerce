@@ -26,7 +26,8 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message?: string;
-  user: User;
+  token?: string;
+  user?: User | null;
   requiresVerification?: boolean;
   email?: string;
 }
@@ -34,6 +35,7 @@ export interface AuthResponse {
 export interface RegisterResponse {
   success: boolean;
   message: string;
+  token?: string;
   requiresVerification?: boolean;
   email?: string;
 }
@@ -41,6 +43,7 @@ export interface RegisterResponse {
 export interface VerifyEmailResponse {
   success: boolean;
   message: string;
+  token?: string;
   user: User;
 }
 

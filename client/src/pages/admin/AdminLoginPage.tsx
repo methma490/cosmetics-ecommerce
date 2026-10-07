@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { ShieldCheck, Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -14,23 +14,70 @@ const AdminLoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Validation State
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   // If already authenticated as admin, redirect immediately
   if (user && user.role === 'admin') {
     return <Navigate to="/admin" replace />;
   }
 
+  const validateField = (name: string, value: string): string => {
+    const val = value.trim();
+    if (name === 'email') {
+      if (!val) return 'Administrative staff email is required';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Please enter a valid email address';
+      return '';
+    }
+    if (name === 'password') {
+      if (!value) return 'Administrative password is required';
+      if (value.length < 6) return 'Password must be at least 6 characters';
+      return '';
+    }
+    return '';
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const err = validateField(field, field === 'email' ? email : password);
+    setFieldErrors((prev) => ({ ...prev, [field]: err }));
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmail(val);
+    if (touched.email) {
+      setFieldErrors((prev) => ({ ...prev, email: validateField('email', val) }));
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setPassword(val);
+    if (touched.password) {
+      setFieldErrors((prev) => ({ ...prev, password: validateField('password', val) }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!email.trim() || !password) {
-      setError('Please provide both administrative email and password');
+    const emailErr = validateField('email', email);
+    const passErr = validateField('password', password);
+
+    setTouched({ email: true, password: true });
+    setFieldErrors({ email: emailErr, password: passErr });
+
+    if (emailErr || passErr) {
+      setError('Please provide valid administrative credentials.');
       return;
     }
 
     try {
       setLoading(true);
-      const loggedUser = await login({ email, password });
+      const loggedUser = await login({ email: email.trim(), password });
       if (loggedUser.role !== 'admin') {
         setError('Access denied: This account does not possess administrative privileges.');
         toast.error('Unauthorized account role');
@@ -38,9 +85,10 @@ const AdminLoginPage: React.FC = () => {
       }
       toast.success('Welcome back to the Admin Atelier');
       navigate('/admin');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Admin login error:', err);
-      const msg = err?.response?.data?.message || err?.message || 'Authentication failed. Please verify credentials.';
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.message || axiosErr?.message || 'Authentication failed. Please verify credentials.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -70,12 +118,13 @@ const AdminLoginPage: React.FC = () => {
           <div className="absolute top-0 left-0 right-0 h-1 bg-[#D4AF37]" />
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
-              {error}
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{error}</span>
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div>
               <label className="block text-xs font-semibold text-[#211A1C] uppercase tracking-wider mb-2">
                 Staff Email
@@ -87,12 +136,22 @@ const AdminLoginPage: React.FC = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  onChange={handleEmailChange}
+                  onBlur={() => handleBlur('email')}
                   placeholder="admin@cosmetics.com"
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-[#F0DFD8] rounded-xl text-sm text-[#211A1C] placeholder-[#756D70]/50 focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
+                  className={`w-full pl-10 pr-4 py-3 bg-white border rounded-xl text-sm text-[#211A1C] placeholder-[#756D70]/50 transition-all focus:outline-hidden ${
+                    touched.email && fieldErrors.email
+                      ? 'border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20'
+                      : 'border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20'
+                  }`}
                 />
               </div>
+              {touched.email && fieldErrors.email && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{fieldErrors.email}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -106,10 +165,14 @@ const AdminLoginPage: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onChange={handlePasswordChange}
+                  onBlur={() => handleBlur('password')}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-10 py-3 bg-white border border-[#F0DFD8] rounded-xl text-sm text-[#211A1C] placeholder-[#756D70]/50 focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20 transition-all"
+                  className={`w-full pl-10 pr-10 py-3 bg-white border rounded-xl text-sm text-[#211A1C] placeholder-[#756D70]/50 transition-all focus:outline-hidden ${
+                    touched.password && fieldErrors.password
+                      ? 'border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20'
+                      : 'border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20'
+                  }`}
                 />
                 <button
                   type="button"
@@ -119,6 +182,12 @@ const AdminLoginPage: React.FC = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {touched.password && fieldErrors.password && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{fieldErrors.password}</span>
+                </p>
+              )}
             </div>
 
             <div className="pt-2">
@@ -128,7 +197,10 @@ const AdminLoginPage: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[#B87D4B] hover:bg-[#9E6536] shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
-                  <span>Authenticating...</span>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Authenticating...</span>
+                  </>
                 ) : (
                   <>
                     <span>Enter Management Portal</span>

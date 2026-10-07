@@ -1,16 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
-  ArrowRight,
   Sparkles,
   ChevronDown,
   Play,
   Pause,
-  Eye,
-  CheckCircle2,
 } from "lucide-react";
 
-export interface HeroScene {
+interface HeroScene {
   id: string;
   tabLabel: string;
   ritualName: string;
@@ -26,7 +22,7 @@ export interface HeroScene {
   keyActives: string[];
 }
 
-export const HERO_SCENES: HeroScene[] = [
+const HERO_SCENES: HeroScene[] = [
   {
     id: "serum-dropper",
     tabLabel: "Botanical Serum",
@@ -92,10 +88,8 @@ export const CinematicVideoHero: React.FC = () => {
 
   const activeScene = HERO_SCENES[activeSceneIndex];
 
-  // When scene changes, reset ready state and play
+  // When scene or paused state changes, synchronize playback
   useEffect(() => {
-    setVideoReady(false);
-    setVideoFailed(false);
     const v = videoRef.current;
     if (v) {
       v.load();
@@ -103,7 +97,14 @@ export const CinematicVideoHero: React.FC = () => {
         v.play().catch(() => {});
       }
     }
-  }, [activeSceneIndex]);
+  }, [activeSceneIndex, paused]);
+
+  const handleSceneSelect = (idx: number) => {
+    if (idx === activeSceneIndex) return;
+    setVideoReady(false);
+    setVideoFailed(false);
+    setActiveSceneIndex(idx);
+  };
 
   // Pause video when hero is off-screen (performance)
   useEffect(() => {
@@ -211,24 +212,24 @@ export const CinematicVideoHero: React.FC = () => {
 
         {/* Balanced Cinematic Overlays - calibrated so product remains luminous and visible */}
         <div className="absolute inset-0 bg-radial from-[#140e11]/20 via-[#140e11]/60 to-[#140e11]/85 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#140e11] via-transparent to-[#140e11]/65 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#140e11]/70 via-transparent to-[#140e11]/45 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#140e11] via-transparent to-[#140e11]/65 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#140e11]/70 via-transparent to-[#140e11]/45 pointer-events-none" />
 
         {/* Fade into page bottom */}
-        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-b from-transparent to-[#FFF9F5] pointer-events-none" />
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-linear-to-b from-transparent to-brand-bg pointer-events-none" />
       </div>
 
       {/* ===== VIDEO SCENE & PLAYBACK CONTROLS (Top right / bottom right) ===== */}
       <div className="absolute top-5 sm:top-7 right-4 sm:right-8 z-20 flex items-center gap-2">
-        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1e1518]/70 border border-[#D4AF37]/40 backdrop-blur-md text-[10px] uppercase tracking-wider text-[#FFF1A8]">
-          <span className="w-2 h-2 rounded-full bg-[#56805D] animate-ping" />
+        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1e1518]/70 border border-brand-gold/40 backdrop-blur-md text-[10px] uppercase tracking-wider text-brand-gold-bright">
+          <span className="w-2 h-2 rounded-full bg-brand-success animate-ping" />
           <span>Cinematic 1080p Product Reel</span>
         </div>
         <button
           onClick={togglePause}
           aria-label={paused ? "Play video" : "Pause video"}
           title={paused ? "Play video" : "Pause video"}
-          className="p-2.5 rounded-full bg-[#1e1518]/80 hover:bg-[#1e1518] text-[#FFF1A8] border border-[#D4AF37]/50 backdrop-blur-md transition-all hover:scale-105 shadow-lg"
+          className="p-2.5 rounded-full bg-[#1e1518]/80 hover:bg-[#1e1518] text-brand-gold-bright border border-brand-gold/50 backdrop-blur-md transition-all hover:scale-105 shadow-lg"
         >
           {paused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5" />}
         </button>
@@ -238,20 +239,20 @@ export const CinematicVideoHero: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-16 sm:pb-20 w-full">
         {/* Interactive Scene Switcher Pills */}
         <div className="aura-reveal flex justify-center mb-5 sm:mb-6" style={{ ["--d" as string]: "0.15s" }}>
-          <div className="inline-flex p-1 rounded-full bg-[#1e1518]/80 border border-[#D4AF37]/40 backdrop-blur-md shadow-xl gap-1 max-w-full overflow-x-auto">
+          <div className="inline-flex p-1 rounded-full bg-[#1e1518]/80 border border-brand-gold/40 backdrop-blur-md shadow-xl gap-1 max-w-full overflow-x-auto">
             {HERO_SCENES.map((scene, idx) => {
               const isActive = idx === activeSceneIndex;
               return (
                 <button
                   key={scene.id}
-                  onClick={() => setActiveSceneIndex(idx)}
+                  onClick={() => handleSceneSelect(idx)}
                   className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold tracking-wide transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     isActive
-                      ? "bg-gradient-to-r from-[#B87D4B] to-[#9E6536] text-white shadow-md border border-[#FFF1A8]/30"
+                      ? "bg-linear-to-r from-[#B87D4B] to-brand-primary-hover text-white shadow-md border border-brand-gold-bright/30"
                       : "text-[#F7EFE9]/80 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  <Sparkles className={`w-3 h-3 ${isActive ? "text-[#FFF1A8]" : "text-[#D4AF37]"}`} />
+                  <Sparkles className={`w-3 h-3 ${isActive ? "text-brand-gold-bright" : "text-brand-gold"}`} />
                   <span>{scene.tabLabel}</span>
                 </button>
               );
@@ -259,159 +260,53 @@ export const CinematicVideoHero: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Grid: Headline on left/center, Product In Video Card on right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left / Center Column: Typography & CTAs */}
-          <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-            <div
-              className="aura-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1e1518]/70 border border-[#D4AF37]/60 text-[#FFF1A8] text-[11px] uppercase tracking-[0.22em] font-semibold backdrop-blur-md"
-              style={{ ["--d" as string]: "0.3s" }}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>{activeScene.ritualName}</span>
-            </div>
-
-            <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-normal text-[#FFFCFA] leading-[1.04] tracking-tight">
-              <span className="aura-mask">
-                <span style={{ ["--d" as string]: "0.45s" }}>BEAUTY,</span>
-              </span>
-              <span className="aura-mask">
-                <span style={{ ["--d" as string]: "0.65s" }} className="italic font-light">
-                  <span className="aura-gold">ELEVATED.</span>
-                </span>
-              </span>
-            </h1>
-
-            <div className="flex justify-center lg:justify-start">
-              <div
-                className="aura-rule h-px w-28 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent lg:from-[#D4AF37] lg:to-transparent"
-                style={{ ["--d" as string]: "0.9s" }}
-              />
-            </div>
-
-            <p
-              className="aura-reveal text-sm sm:text-base md:text-lg text-[#F7EFE9] max-w-xl mx-auto lg:mx-0 font-light leading-relaxed tracking-wide"
-              style={{ ["--d" as string]: "1s" }}
-            >
-              Experience the visual purity of our botanical formulations. Every droplet and crystal flacon is crafted with pure active ingredients for extraordinary daily radiance.
-            </p>
-
-            <div
-              className="aura-reveal flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2"
-              style={{ ["--d" as string]: "1.2s" }}
-            >
-              <Link
-                to={`/shop?category=${activeScene.categorySlug}`}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 shadow-xl hover:shadow-[0_10px_35px_-8px_rgba(184,125,75,0.7)] hover:-translate-y-0.5 flex items-center justify-center gap-2 group border border-[#D4AF37]/50"
-              >
-                <span>Shop Featured Product</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/shop"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-[#FFFCFA] border border-[#D4AF37]/50 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-md transition-all duration-300 text-center hover:border-[#FFF1A8] hover:-translate-y-0.5"
-              >
-                Browse All Formulations
-              </Link>
-            </div>
+        {/* Main Headline Presentation (Centered & Distraction-Free) */}
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div
+            className="aura-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1e1518]/70 border border-brand-gold/60 text-brand-gold-bright text-[11px] uppercase tracking-[0.22em] font-semibold backdrop-blur-md"
+            style={{ ["--d" as string]: "0.3s" }}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+            <span>{activeScene.ritualName}</span>
           </div>
 
-          {/* Right Column: FLOATING "PRODUCT IN VIDEO" SPOTLIGHT CARD */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+          <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-normal text-brand-surface leading-[1.04] tracking-tight">
+            <span className="aura-mask">
+              <span style={{ ["--d" as string]: "0.45s" }}>BEAUTY,</span>
+            </span>
+            <span className="aura-mask">
+              <span style={{ ["--d" as string]: "0.65s" }} className="italic font-light">
+                <span className="aura-gold">ELEVATED.</span>
+              </span>
+            </span>
+          </h1>
+
+          <div className="flex justify-center">
             <div
-              className="aura-reveal w-full max-w-sm rounded-3xl bg-[#1e1518]/85 border border-[#D4AF37]/50 p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden group hover:border-[#FFF1A8]/80 transition-all duration-500"
-              style={{ ["--d" as string]: "0.8s" }}
-            >
-              {/* Subtle gold sheen */}
-              <div className="absolute -top-16 -right-16 w-36 h-36 bg-[#D4AF37]/15 rounded-full blur-2xl pointer-events-none" />
-
-              {/* Header Badge */}
-              <div className="flex items-center justify-between gap-2 pb-3.5 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#FFF1A8] font-bold">
-                    Product In Video
-                  </span>
-                </div>
-                <span className="text-[10px] text-[#F7EFE9]/70 font-medium">
-                  {activeScene.categoryLabel}
-                </span>
-              </div>
-
-              {/* Product Mini Showcase */}
-              <div className="flex gap-4 pt-4 items-center">
-                <div className="w-20 h-24 rounded-2xl overflow-hidden bg-black/40 border border-[#D4AF37]/40 shrink-0 relative">
-                  <img
-                    src={activeScene.productImage}
-                    alt={activeScene.productName}
-                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-1 right-1 p-1 rounded-full bg-black/60 text-[#FFF1A8]">
-                    <Eye className="w-2.5 h-2.5" />
-                  </div>
-                </div>
-
-                <div className="space-y-1 min-w-0">
-                  <h3 className="font-serif-luxury text-base sm:text-lg font-medium text-[#FFFCFA] leading-tight line-clamp-2">
-                    {activeScene.productName}
-                  </h3>
-                  <p className="text-[11px] text-[#F7EFE9]/80 font-light line-clamp-2 leading-relaxed">
-                    {activeScene.productTagline}
-                  </p>
-                  <div className="pt-1 flex items-baseline gap-2">
-                    <span className="text-sm font-semibold text-[#FFF1A8] tracking-wide">
-                      {activeScene.priceFormatted}
-                    </span>
-                    <span className="text-[9px] uppercase tracking-wider text-[#56805D] font-medium bg-[#56805D]/15 px-1.5 py-0.5 rounded">
-                      In Stock
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Active Botanical Key Highlights */}
-              <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap gap-1.5">
-                {activeScene.keyActives.map((active, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#F7EFE9]"
-                  >
-                    <CheckCircle2 className="w-2.5 h-2.5 text-[#D4AF37]" />
-                    <span>{active}</span>
-                  </span>
-                ))}
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-4 pt-2">
-                <Link
-                  to={`/shop?category=${activeScene.categorySlug}`}
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#B87D4B] to-[#9E6536] hover:brightness-110 text-white text-xs font-semibold uppercase tracking-[0.16em] transition-all flex items-center justify-center gap-2 shadow-md border border-[#D4AF37]/40"
-                >
-                  <span>Explore in Boutique</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
+              className="aura-rule h-px w-28 bg-linear-to-r from-transparent via-brand-gold to-transparent"
+              style={{ ["--d" as string]: "0.9s" }}
+            />
           </div>
+
+          <p
+            className="aura-reveal text-sm sm:text-base md:text-lg text-[#F7EFE9] max-w-2xl mx-auto font-light leading-relaxed tracking-wide"
+            style={{ ["--d" as string]: "1s" }}
+          >
+            Experience the visual purity of our botanical formulations. Every droplet and crystal flacon is crafted with pure active ingredients for extraordinary daily radiance.
+          </p>
         </div>
 
         {/* 4 Pillars of Excellence */}
         <div
-          className="aura-reveal mt-7 sm:mt-9 pt-5 sm:pt-6 grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto text-left border-t border-white/10"
+          className="aura-reveal mt-8 sm:mt-10 pt-6 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center border-t border-white/10"
           style={{ ["--d" as string]: "1.4s" }}
         >
           {HIGHLIGHTS.map((h) => (
             <div key={h.k} className="space-y-0.5">
-              <span className="text-[10px] uppercase tracking-widest text-[#D4AF37] font-semibold block">
+              <span className="text-[10px] uppercase tracking-widest text-brand-gold font-semibold block">
                 {h.k}
               </span>
-              <p className="text-xs text-[#FFFCFA] font-medium">{h.v}</p>
+              <p className="text-xs text-brand-surface font-medium">{h.v}</p>
             </div>
           ))}
         </div>
@@ -421,7 +316,7 @@ export const CinematicVideoHero: React.FC = () => {
       <a
         href="#formulations-in-motion"
         aria-label="Scroll to collection"
-        className="aura-fadein absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-[#D4AF37] hover:text-[#FFF1A8] transition-colors flex flex-col items-center gap-1 group"
+        className="aura-fadein absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-brand-gold hover:text-brand-gold-bright transition-colors flex flex-col items-center gap-1 group"
         style={{ ["--d" as string]: "1.8s" }}
       >
         <span className="text-[10px] uppercase tracking-widest font-medium opacity-80 group-hover:opacity-100">

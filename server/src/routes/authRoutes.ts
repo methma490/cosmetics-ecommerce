@@ -10,7 +10,7 @@ import {
   deleteMyAccount,
 } from "../controllers/authController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
@@ -44,7 +44,7 @@ router.post("/logout", logout);
 
 router.get(
   "/me",
-  protect,
+  optionalAuth,
   getMe
 );
 

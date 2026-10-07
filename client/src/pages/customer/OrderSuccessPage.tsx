@@ -205,6 +205,25 @@ export const OrderSuccessPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-3">
+            {order.paymentMethod === "whatsapp" && (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const wa = await orderService.getWhatsAppOrder(order._id);
+                    if (wa.whatsappUrl) window.open(wa.whatsappUrl, "_blank");
+                  } catch {
+                    // Fallback direct WhatsApp link
+                    const msg = `Hello AURA Haute Beauté! Here is my confirmed order: ${order.orderNumber} (Total: ${formatPrice(order.total)}).`;
+                    window.open(`https://wa.me/94743301490?text=${encodeURIComponent(msg)}`, "_blank");
+                  }
+                }}
+                className="w-full py-3.5 px-4 rounded-full bg-[#56805D] hover:bg-[#436449] text-white text-xs font-semibold uppercase tracking-wider text-center transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Open WhatsApp Concierge</span>
+              </button>
+            )}
             <Link
               to="/account"
               className="w-full py-3.5 px-4 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider text-center transition-all shadow-xs"

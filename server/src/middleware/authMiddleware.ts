@@ -16,9 +16,14 @@ export const protect = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.cookies?.[AUTH_COOKIE_NAME] as
+    const authHeader = req.headers.authorization;
+    let token = req.cookies?.[AUTH_COOKIE_NAME] as
       | string
       | undefined;
+
+    if (!token && authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7).trim();
+    }
 
     if (!token) {
       res.status(401).json({
@@ -95,9 +100,14 @@ export const optionalAuth = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const token = req.cookies?.[AUTH_COOKIE_NAME] as
+    const authHeader = req.headers.authorization;
+    let token = req.cookies?.[AUTH_COOKIE_NAME] as
       | string
       | undefined;
+
+    if (!token && authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7).trim();
+    }
 
     if (!token) {
       next();

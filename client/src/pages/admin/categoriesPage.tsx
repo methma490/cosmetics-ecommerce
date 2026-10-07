@@ -25,6 +25,8 @@ export const CategoriesPage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false);
+  const [nameError, setNameError] = useState("");
 
   // Delete State
   const [deleteCandidate, setDeleteCandidate] = useState<Category | null>(null);
@@ -63,11 +65,20 @@ export const CategoriesPage: React.FC = () => {
     void loadCategories();
   }, []);
 
+  const validateCategoryName = (val: string): string => {
+    const trimmed = val.trim();
+    if (!trimmed) return "Category name is required";
+    if (trimmed.length < 2) return "Category name must be at least 2 characters";
+    return "";
+  };
+
   const openAddModal = () => {
     setEditingCategory(null);
     setName("");
     setDescription("");
     setIsActive(true);
+    setNameTouched(false);
+    setNameError("");
     setModalOpen(true);
   };
 
@@ -76,13 +87,18 @@ export const CategoriesPage: React.FC = () => {
     setName(cat.name);
     setDescription(cat.description || "");
     setIsActive(cat.isActive);
+    setNameTouched(false);
+    setNameError("");
     setModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      toast.error("Category name is required.");
+    setNameTouched(true);
+    const err = validateCategoryName(name);
+    setNameError(err);
+    if (err) {
+      toast.error(err);
       return;
     }
 
@@ -279,11 +295,27 @@ export const CategoriesPage: React.FC = () => {
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (nameTouched) setNameError(validateCategoryName(e.target.value));
+                  }}
+                  onBlur={() => {
+                    setNameTouched(true);
+                    setNameError(validateCategoryName(name));
+                  }}
                   placeholder="e.g. Body Care"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DADD] text-xs sm:text-sm text-[#252223] bg-white focus:outline-hidden focus:border-[#C85C7A]"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#252223] bg-white transition-all focus:outline-hidden ${
+                    nameTouched && nameError
+                      ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                      : "border-[#E8DADD] focus:border-[#C85C7A] focus:ring-1 focus:ring-[#C85C7A]/20"
+                  }`}
                 />
+                {nameTouched && nameError && (
+                  <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{nameError}</span>
+                  </p>
+                )}
               </div>
 
               <div>

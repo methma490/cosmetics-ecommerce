@@ -42,14 +42,7 @@ export const getWhatsAppOrder = async (
     const role =
       req.user?.role;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: "Authentication required",
-      });
-
-      return;
-    }
+    // userId is optional (guests can also request WhatsApp order info for their guest order)
 
     if (
       typeof id !== "string" ||
@@ -86,6 +79,7 @@ export const getWhatsAppOrder = async (
     */
 
     if (
+      order.user &&
       role !== "admin" &&
       order.user.toString() !== userId
     ) {
@@ -194,15 +188,7 @@ export const createOrder = async (
 
     const userId = req.user?.userId;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message:
-          "Authentication required",
-      });
-
-      return;
-    }
+    // userId is optional: logged-in user links to their account, guest order has no user account
 
     /*
     |--------------------------------------------------------------------------
@@ -656,7 +642,7 @@ export const createOrder = async (
       await Order.create({
         orderNumber,
 
-        user: userId,
+        user: userId || undefined,
 
         customer: {
           firstName:
@@ -723,8 +709,10 @@ export const createOrder = async (
           false,
       });
 
-    // Clear user's database cart upon order creation
-    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+    // Clear user's database cart upon order creation if logged in
+    if (userId) {
+      await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -833,15 +821,7 @@ export const getOrderById = async (
     const role =
       req.user?.role;
 
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message:
-          "Authentication required",
-      });
-
-      return;
-    }
+    // userId is optional: allows guests to view order confirmation by ID
 
     if (
       typeof id !== "string" ||
@@ -887,9 +867,10 @@ export const getOrderById = async (
     */
 
     if (
+      order.user &&
       role !== "admin" &&
-      order.user._id.toString() !==
-        userId
+      (order.user as any)._id?.toString() !== userId &&
+      (order.user as any).toString() !== userId
     ) {
       res.status(403).json({
         success: false,

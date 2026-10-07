@@ -13,6 +13,7 @@ import {
 
 import {
   protect,
+  optionalAuth,
 } from "../middleware/authMiddleware.js";
 
 import {
@@ -29,7 +30,7 @@ const router = Router();
 
 router.post(
   "/",
-  protect,
+  optionalAuth,
   createOrder
 );
 
@@ -95,13 +96,13 @@ router.delete(
 
 router.get(
   "/:id",
-  protect,
+  optionalAuth,
   getOrderById
 );
 
 router.get(
   "/:id/whatsapp",
-  protect,
+  optionalAuth,
   getWhatsAppOrder
 );
 

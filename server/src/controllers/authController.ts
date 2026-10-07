@@ -406,7 +406,7 @@ export const login = async (
     res.status(200).json({
       success: true,
       message: "Login successful",
-
+      token,
       user: {
         id: user._id,
         email: user.email,
@@ -442,9 +442,9 @@ export const getMe = async (
     */
 
     if (!req.user) {
-      res.status(401).json({
-        success: false,
-        message: "Authentication required",
+      res.status(200).json({
+        success: true,
+        user: null,
       });
 
       return;
@@ -461,9 +461,10 @@ export const getMe = async (
     );
 
     if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "User not found",
+      clearAuthCookie(res);
+      res.status(200).json({
+        success: true,
+        user: null,
       });
 
       return;
@@ -580,6 +581,7 @@ export const verifyEmail = async (
       res.status(200).json({
         success: true,
         message: "Your account is already verified.",
+        token,
         user: {
           id: user._id,
           email: user.email,
@@ -634,6 +636,7 @@ export const verifyEmail = async (
     res.status(200).json({
       success: true,
       message: "Account verified successfully! Welcome to AURA Atelier.",
+      token,
       user: {
         id: user._id,
         email: user.email,

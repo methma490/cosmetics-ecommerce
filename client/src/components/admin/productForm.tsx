@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Trash2, ArrowLeft, Loader2, UploadCloud, Image as ImageIcon, Sparkles } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Loader2, UploadCloud, Image as ImageIcon, Sparkles, AlertCircle } from "lucide-react";
 import categoryService from "../../services/categoryService";
 import uploadService from "../../services/uploadService";
 import type { Category } from "../../types/category";
@@ -52,6 +52,53 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [isActive, setIsActive] = useState(
     initialProduct?.isActive !== undefined ? initialProduct.isActive : true
   );
+
+  // Validation State
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateField = (fieldName: string, val: string | number | string[]): string => {
+    switch (fieldName) {
+      case "name":
+        if (typeof val === "string" && !val.trim()) return "Product name is required";
+        if (typeof val === "string" && val.trim().length < 3) return "Product name must be at least 3 characters";
+        return "";
+      case "categoryId":
+        if (!val) return "Please select a category";
+        return "";
+      case "price": {
+        const num = typeof val === "number" ? val : parseFloat(val as string);
+        if (isNaN(num) || num <= 0) return "Price must be greater than 0";
+        return "";
+      }
+      case "stock": {
+        const num = typeof val === "number" ? val : parseInt(val as string, 10);
+        if (isNaN(num) || num < 0) return "Stock must be 0 or higher";
+        return "";
+      }
+      case "description":
+        if (typeof val === "string" && !val.trim()) return "Description is required";
+        if (typeof val === "string" && val.trim().length < 10) return "Description must be at least 10 characters";
+        return "";
+      case "images":
+        if (Array.isArray(val) && val.length === 0) return "At least one product image is required";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    let val: string | number | string[] = "";
+    if (field === "name") val = name;
+    else if (field === "categoryId") val = categoryId;
+    else if (field === "price") val = price;
+    else if (field === "stock") val = stock;
+    else if (field === "description") val = description;
+    else if (field === "images") val = images;
+    setErrors((prev) => ({ ...prev, [field]: validateField(field, val) }));
+  };
 
   useEffect(() => {
     categoryService
@@ -126,33 +173,33 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      toast.error("Product name is required.");
-      return;
-    }
+    const newErrors: Record<string, string> = {
+      name: validateField("name", name),
+      categoryId: validateField("categoryId", categoryId),
+      price: validateField("price", price),
+      stock: validateField("stock", stock),
+      description: validateField("description", description),
+      images: validateField("images", images),
+    };
 
-    if (!categoryId) {
-      toast.error("Please select a category.");
+    setTouched({
+      name: true,
+      categoryId: true,
+      price: true,
+      stock: true,
+      description: true,
+      images: true,
+    });
+    setErrors(newErrors);
+
+    const errorKeys = Object.keys(newErrors).filter((k) => Boolean(newErrors[k]));
+    if (errorKeys.length > 0) {
+      toast.error("Please resolve highlighted product errors.");
       return;
     }
 
     const numericPrice = parseFloat(price);
-    if (isNaN(numericPrice) || numericPrice < 0) {
-      toast.error("Please enter a valid price.");
-      return;
-    }
-
     const numericStock = parseInt(stock, 10);
-    if (isNaN(numericStock) || numericStock < 0) {
-      toast.error("Please enter a valid whole number for stock.");
-      return;
-    }
-
-    if (!description.trim()) {
-      toast.error("Description is required.");
-      return;
-    }
-
     const cleanImages = images
       .map((img) => img.trim())
       .filter((img) => img.length > 0);
@@ -208,11 +255,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (touched.name) setErrors((errs) => ({ ...errs, name: validateField("name", e.target.value) }));
+                }}
+                onBlur={() => handleBlur("name")}
                 placeholder="e.g. Luminous Botanical Serum"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.name && errors.name
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               />
+              {touched.name && errors.name && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.name}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -236,10 +296,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </label>
               <select
                 value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                required
+                onChange={(e) => {
+                  setCategoryId(e.target.value);
+                  if (touched.categoryId) setErrors((errs) => ({ ...errs, categoryId: validateField("categoryId", e.target.value) }));
+                }}
+                onBlur={() => handleBlur("categoryId")}
                 disabled={loadingCategories}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.categoryId && errors.categoryId
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               >
                 {categories.map((c) => (
                   <option key={c._id} value={c._id}>
@@ -247,6 +314,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </option>
                 ))}
               </select>
+              {touched.categoryId && errors.categoryId && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.categoryId}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -256,13 +329,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <input
                 type="number"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
+                onChange={(e) => {
+                  setPrice(e.target.value);
+                  if (touched.price) setErrors((errs) => ({ ...errs, price: validateField("price", e.target.value) }));
+                }}
+                onBlur={() => handleBlur("price")}
                 min="0"
                 step="any"
                 placeholder="4850"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.price && errors.price
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               />
+              {touched.price && errors.price && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.price}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -272,13 +358,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <input
                 type="number"
                 value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                required
+                onChange={(e) => {
+                  setStock(e.target.value);
+                  if (touched.stock) setErrors((errs) => ({ ...errs, stock: validateField("stock", e.target.value) }));
+                }}
+                onBlur={() => handleBlur("stock")}
                 min="0"
                 step="1"
                 placeholder="20"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                  touched.stock && errors.stock
+                    ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                    : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+                }`}
               />
+              {touched.stock && errors.stock && (
+                <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span>{errors.stock}</span>
+                </p>
+              )}
             </div>
           </div>
 
@@ -289,11 +388,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <textarea
               rows={4}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
+              onChange={(e) => {
+                setDescription(e.target.value);
+                if (touched.description) setErrors((errs) => ({ ...errs, description: validateField("description", e.target.value) }));
+              }}
+              onBlur={() => handleBlur("description")}
               placeholder="Describe the product benefits, active botanicals, and texture..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#F0DFD8] text-xs sm:text-sm text-[#211A1C] bg-white focus:outline-hidden focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-[#211A1C] bg-white transition-all focus:outline-hidden ${
+                touched.description && errors.description
+                  ? "border-[#B33A3A] bg-[#FFFBFB] ring-1 ring-[#B33A3A]/20"
+                  : "border-[#F0DFD8] focus:border-[#B87D4B] focus:ring-1 focus:ring-[#B87D4B]/20"
+              }`}
             />
+            {touched.description && errors.description && (
+              <p className="mt-1 text-[11px] text-[#B33A3A] flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                <span>{errors.description}</span>
+              </p>
+            )}
           </div>
         </div>
 
