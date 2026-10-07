@@ -786,19 +786,9 @@ export const deleteMyAccount = async (
 
     const userId = req.user.userId;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("role");
 
-    if (!user) {
-      clearAuthCookie(res);
-      res.status(404).json({
-        success: false,
-        message: "User account not found in database.",
-      });
-
-      return;
-    }
-
-    if (user.role === "admin") {
+    if (user?.role === "admin") {
       res.status(403).json({
         success: false,
         message: "Administrative accounts cannot be self-deleted.",
@@ -807,22 +797,19 @@ export const deleteMyAccount = async (
       return;
     }
 
-    // 1. Delete login credentials from database (User model)
-    await User.findByIdAndDelete(userId);
+    // Remove every account-owned record, including orphaned profile/cart data.
+    await Promise.all([
+      User.deleteOne({ _id: userId }),
+      UserProfile.deleteMany({ user: userId }),
+      Cart.deleteMany({ user: userId }),
+    ]);
 
-    // 2. Delete user profile from database (UserProfile model)
-    await UserProfile.deleteMany({ user: userId });
-
-    // 3. Delete customer cart from database (Cart model)
-    await Cart.deleteMany({ user: userId });
-
-    // 4. Clear authentication cookie
     clearAuthCookie(res);
 
     res.status(200).json({
       success: true,
       message:
-        "Your profile and login credentials have been permanently deleted from the database.",
+        "Your profile, login credentials, and cart have been permanently deleted.",
     });
   } catch (error) {
     console.error("Delete user account error:", error);
