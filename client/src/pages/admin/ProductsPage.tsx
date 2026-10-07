@@ -17,6 +17,7 @@ import type { Category } from "../../types/category";
 import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,6 +27,19 @@ export const ProductsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [deleteCandidate, setDeleteCandidate] = useState<Product | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Lock background scrolling when Delete confirmation modal is open
+  useBodyScrollLock(Boolean(deleteCandidate));
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && deleteCandidate) {
+        setDeleteCandidate(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [deleteCandidate]);
 
   const loadData = async () => {
     try {
@@ -312,7 +326,14 @@ export const ProductsPage: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDeleteCandidate(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
+        >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-sm w-full space-y-4 shadow-xl">
             <div className="w-12 h-12 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />

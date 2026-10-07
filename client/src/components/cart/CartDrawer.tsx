@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X, ShoppingBag, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import CartItem from "./cartItem";
 import { formatPrice } from "../../utils/formatPrice";
 import { generateWhatsAppMessage } from "../../utils/generateWhatsAppMessage";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export const CartDrawer: React.FC = () => {
   const { isCartOpen, closeCart, items, itemCount, subtotal, shippingFee, total } =
     useCart();
+
+  // Lock background scroll when shopping bag drawer is open
+  useBodyScrollLock(isCartOpen);
+
+  useEffect(() => {
+    if (!isCartOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCart();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isCartOpen, closeCart]);
 
   if (!isCartOpen) return null;
 

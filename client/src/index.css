@@ -59,6 +59,15 @@ body {
   flex-direction: column;
 }
 
+/* Universal Modal / Popup Background Scroll Lock */
+html.modal-open,
+body.modal-open {
+  overflow: hidden !important;
+  height: 100vh !important;
+  touch-action: none !important;
+  overscroll-behavior: contain !important;
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -147,6 +156,23 @@ body {
 /* Custom smooth transitions */
 .transition-smooth {
   transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Smooth Page Navigation Transition */
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
 }
 
 /* Custom scrollbar for drawers and modals */

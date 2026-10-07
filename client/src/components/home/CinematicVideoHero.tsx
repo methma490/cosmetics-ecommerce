@@ -153,7 +153,7 @@ export const CinematicVideoHero: React.FC = () => {
     <section
       ref={sectionRef}
       data-paused={paused ? "1" : "0"}
-      className="aura-hero relative w-full min-h-[92vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#140e11]"
+      className="aura-hero relative w-full min-h-[85vh] sm:min-h-[88vh] lg:min-h-screen flex items-start sm:items-center justify-center overflow-hidden bg-[#140e11]"
     >
       <style>{`
         @keyframes auraFadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -219,7 +219,7 @@ export const CinematicVideoHero: React.FC = () => {
       </div>
 
       {/* ===== VIDEO SCENE & PLAYBACK CONTROLS (Top right / bottom right) ===== */}
-      <div className="absolute top-24 right-4 sm:right-8 z-20 flex items-center gap-2">
+      <div className="absolute top-5 sm:top-7 right-4 sm:right-8 z-20 flex items-center gap-2">
         <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1e1518]/70 border border-[#D4AF37]/40 backdrop-blur-md text-[10px] uppercase tracking-wider text-[#FFF1A8]">
           <span className="w-2 h-2 rounded-full bg-[#56805D] animate-ping" />
           <span>Cinematic 1080p Product Reel</span>
@@ -235,9 +235,9 @@ export const CinematicVideoHero: React.FC = () => {
       </div>
 
       {/* ===== HERO CONTENT CONTAINER ===== */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-16 sm:pb-20 w-full">
         {/* Interactive Scene Switcher Pills */}
-        <div className="aura-reveal flex justify-center mb-6" style={{ ["--d" as string]: "0.15s" }}>
+        <div className="aura-reveal flex justify-center mb-5 sm:mb-6" style={{ ["--d" as string]: "0.15s" }}>
           <div className="inline-flex p-1 rounded-full bg-[#1e1518]/80 border border-[#D4AF37]/40 backdrop-blur-md shadow-xl gap-1 max-w-full overflow-x-auto">
             {HERO_SCENES.map((scene, idx) => {
               const isActive = idx === activeSceneIndex;
@@ -403,7 +403,7 @@ export const CinematicVideoHero: React.FC = () => {
 
         {/* 4 Pillars of Excellence */}
         <div
-          className="aura-reveal mt-12 pt-8 grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto text-left border-t border-white/10"
+          className="aura-reveal mt-7 sm:mt-9 pt-5 sm:pt-6 grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto text-left border-t border-white/10"
           style={{ ["--d" as string]: "1.4s" }}
         >
           {HIGHLIGHTS.map((h) => (

@@ -1385,3 +1385,53 @@ export const updatePaymentStatus = async (
     });
   }
 };
+
+/*
+|--------------------------------------------------------------------------
+| DELETE ORDER (ADMIN)
+|--------------------------------------------------------------------------
+*/
+
+export const deleteOrder = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    if (
+      typeof id !== "string" ||
+      !mongoose.Types.ObjectId.isValid(id)
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
+      });
+
+      return;
+    }
+
+    const order = await Order.findByIdAndDelete(id);
+
+    if (!order) {
+      res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete order error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete order",
+    });
+  }
+};

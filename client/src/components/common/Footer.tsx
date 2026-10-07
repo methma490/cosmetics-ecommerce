@@ -123,7 +123,7 @@ export const Footer: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder="methmagk@gmail.com"
                   className="w-full px-4 py-2.5 rounded-full bg-white/10 border border-[#D4AF37]/40 text-xs text-white placeholder:text-white/40 focus:outline-hidden focus:border-[#FFF1A8]"
                 />
                 <button
@@ -135,22 +135,6 @@ export const Footer: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#F7EFE9]/60 gap-4">
-          <p>© {new Date().getFullYear()} AURA Haute Beauté. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
-              <span>Verified PayHere & WhatsApp Flow</span>
-            </div>
-            <span>•</span>
-            <Link to="/admin/login" className="hover:text-[#FFF1A8] transition-colors flex items-center gap-1">
-              <Lock className="w-3 h-3 text-[#D4AF37]" />
-              <span>Admin Atelier</span>
-            </Link>
           </div>
         </div>
       </div>

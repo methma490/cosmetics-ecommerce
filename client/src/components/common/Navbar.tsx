@@ -20,6 +20,7 @@ import { useCart } from "../../context/CartContext";
 import productService from "../../services/productService";
 import type { Product } from "../../types/product";
 import { formatPrice } from "../../utils/formatPrice";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 interface MegaMenuColumn {
   heading: string;
@@ -353,6 +354,18 @@ export const Navbar: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<Record<string, boolean>>({});
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Lock background scroll when mobile menu drawer is open
+  useBodyScrollLock(mobileMenuOpen);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
 
   // Close menus on route change
   useEffect(() => {

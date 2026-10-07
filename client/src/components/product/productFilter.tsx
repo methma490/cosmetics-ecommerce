@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { Category } from "../../types/category";
 import { ChevronDown, X, Check } from "lucide-react";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export interface ProductFilterProps {
   categories: Category[];
@@ -128,6 +129,18 @@ export const ProductFilter: React.FC<ProductFilterProps> = ({
   onAromaChange,
   onApplyFilters,
 }) => {
+  // Lock background scroll when mobile filter drawer is open
+  useBodyScrollLock(Boolean(isOpenMobile));
+
+  useEffect(() => {
+    if (!isOpenMobile) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpenMobile(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpenMobile, setIsOpenMobile]);
+
   // Accordion open/close state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     sort: false,

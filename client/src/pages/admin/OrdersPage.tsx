@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Truck,
   Eye,
+  Trash2,
   X,
 } from "lucide-react";
 import orderService from "../../services/orderService";
@@ -15,6 +16,7 @@ import type { Order, OrderStatus, PaymentStatus } from "../../types/order";
 import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -28,6 +30,19 @@ export const OrdersPage: React.FC = () => {
   // Inspect Modal
   const [inspectOrder, setInspectOrder] = useState<Order | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // Lock background scrolling when Inspect modal is open
+  useBodyScrollLock(Boolean(inspectOrder));
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && inspectOrder) {
+        setInspectOrder(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [inspectOrder]);
 
   const loadOrders = async () => {
     try {
@@ -97,6 +112,34 @@ export const OrdersPage: React.FC = () => {
     } catch (err: unknown) {
       toast.error(
         err instanceof Error ? err.message : "Failed to update payment status."
+      );
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to permanently delete order ${orderNumber}?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setUpdatingStatus(true);
+      const res = await orderService.deleteOrder(orderId);
+      if (res.success) {
+        toast.success(`Order ${orderNumber} deleted successfully.`);
+        setOrders((prev) => prev.filter((o) => o._id !== orderId));
+        if (inspectOrder && inspectOrder._id === orderId) {
+          setInspectOrder(null);
+        }
+      }
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete order."
       );
     } finally {
       setUpdatingStatus(false);
@@ -266,7 +309,7 @@ export const OrdersPage: React.FC = () => {
                   <th className="py-3.5 px-4">Total</th>
                   <th className="py-3.5 px-4">Payment</th>
                   <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Inspect</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F0DFD8]">
@@ -324,14 +367,24 @@ export const OrdersPage: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setInspectOrder(o)}
-                          className="p-1.5 rounded-lg border border-[#E8DADD] text-[#756D70] hover:text-[#C85C7A] hover:bg-white transition-colors"
-                          title="Inspect full order"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setInspectOrder(o)}
+                            className="p-1.5 rounded-lg border border-[#E8DADD] text-[#756D70] hover:text-[#C85C7A] hover:bg-white transition-colors"
+                            title="Inspect full order"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteOrder(o._id, o.orderNumber)}
+                            className="p-1.5 rounded-lg border border-[#F0DFD8] text-[#756D70] hover:text-[#DC2626] hover:bg-[#FEE2E2]/40 transition-colors"
+                            title="Delete order"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -344,7 +397,14 @@ export const OrdersPage: React.FC = () => {
 
       {/* Inspect & Manage Order Modal */}
       {inspectOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setInspectOrder(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
+        >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-[#E8DADD]/60">
               <div>
@@ -491,11 +551,23 @@ export const OrdersPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-[#E8DADD] flex justify-end">
+            <div className="pt-4 border-t border-[#E8DADD] flex items-center justify-between">
+              <button
+                type="button"
+                disabled={updatingStatus}
+                onClick={() =>
+                  handleDeleteOrder(inspectOrder._id, inspectOrder.orderNumber)
+                }
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete Order
+              </button>
+
               <button
                 type="button"
                 onClick={() => setInspectOrder(null)}
-                className="px-6 py-2.5 rounded-full bg-[#252223] text-white text-xs font-semibold hover:bg-black transition-colors"
+                className="px-6 py-2.5 rounded-full bg-[#252223] text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
               >
                 Close
               </button>

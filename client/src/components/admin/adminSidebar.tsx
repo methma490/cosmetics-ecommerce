@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -9,6 +9,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 interface AdminSidebarProps {
   mobileOpen?: boolean;
@@ -20,6 +21,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   setMobileOpen,
 }) => {
   const location = useLocation();
+
+  // Lock background scroll when mobile sidebar drawer is open
+  useBodyScrollLock(Boolean(mobileOpen));
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && setMobileOpen) setMobileOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen, setMobileOpen]);
 
   const navItems = [
     {

@@ -8,6 +8,7 @@ import {
   getWhatsAppOrder,
   updateOrderStatus,
   updatePaymentStatus,
+  deleteOrder,
 } from "../controllers/orderController.js";
 
 import {
@@ -74,6 +75,13 @@ router.patch(
   protect,
   adminOnly,
   updatePaymentStatus
+);
+
+router.delete(
+  "/admin/:id",
+  protect,
+  adminOnly,
+  deleteOrder
 );
 
 /*

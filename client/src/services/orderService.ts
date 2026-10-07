@@ -64,6 +64,15 @@ export const orderService = {
     );
     return response.data;
   },
+
+  deleteOrder: async (
+    id: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete<{ success: boolean; message: string }>(
+      `/orders/admin/${id}`
+    );
+    return response.data;
+  },
 };
 
 export default orderService;

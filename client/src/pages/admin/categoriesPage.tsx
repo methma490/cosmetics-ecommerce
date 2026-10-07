@@ -12,6 +12,7 @@ import categoryService from "../../services/categoryService";
 import type { Category } from "../../types/category";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,6 +29,20 @@ export const CategoriesPage: React.FC = () => {
   // Delete State
   const [deleteCandidate, setDeleteCandidate] = useState<Category | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Lock background scrolling when either modal is open
+  useBodyScrollLock(modalOpen || Boolean(deleteCandidate));
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (deleteCandidate) setDeleteCandidate(null);
+        else if (modalOpen) setModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [deleteCandidate, modalOpen]);
 
   const loadCategories = async () => {
     try {
@@ -234,7 +249,14 @@ export const CategoriesPage: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalOpen(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
+        >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-[#E8DADD]/60">
               <h3 className="font-serif-luxury text-lg font-semibold text-[#252223]">
@@ -320,7 +342,14 @@ export const CategoriesPage: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDeleteCandidate(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
+        >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-sm w-full space-y-4 shadow-xl">
             <div className="w-12 h-12 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
