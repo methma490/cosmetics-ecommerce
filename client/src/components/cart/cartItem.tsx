@@ -1,7 +1,7 @@
 import React from "react";
 import { Trash2, Plus, Minus } from "lucide-react";
-import type { CartItem as CartItemType } from "../../context/CartContext";
-import { useCart } from "../../context/CartContext";
+import type { CartItem as CartItemType } from "../../context/CartContextDefinition";
+import { useCart } from "../../hooks/useCart";
 import { formatPrice } from "../../utils/formatPrice";
 import { Link } from "react-router-dom";
 

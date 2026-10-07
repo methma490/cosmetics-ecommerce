@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ShoppingBag, 
@@ -24,11 +24,7 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -43,13 +39,33 @@ const DashboardPage: React.FC = () => {
       if (productsRes.success) {
         setProducts(productsRes.products || []);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load dashboard data:', err);
-      setError(err?.response?.data?.message || 'Failed to load dashboard overview');
+      const responseMessage =
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        typeof err.response === "object" &&
+        err.response !== null &&
+        "data" in err.response &&
+        typeof err.response.data === "object" &&
+        err.response.data !== null &&
+        "message" in err.response.data &&
+        typeof err.response.data.message === "string"
+          ? err.response.data.message
+          : null;
+      setError(responseMessage || 'Failed to load dashboard overview');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchDashboardData();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchDashboardData]);
 
   // Derive genuine stats
   const totalRevenue = orders

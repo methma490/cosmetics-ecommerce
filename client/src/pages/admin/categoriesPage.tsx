@@ -62,7 +62,10 @@ export const CategoriesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    void loadCategories();
+    const timer = setTimeout(() => {
+      void loadCategories();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const validateCategoryName = (val: string): string => {

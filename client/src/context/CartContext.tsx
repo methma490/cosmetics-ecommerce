@@ -1,6 +1,4 @@
 import React, {
-  createContext,
-  useContext,
   useEffect,
   useState,
   useMemo,
@@ -11,36 +9,15 @@ import type { Product } from "../types/product";
 import { useAuth } from "./AuthContext";
 import cartService from "../services/cartService";
 import toast from "react-hot-toast";
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-interface CartContextType {
-  items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => boolean;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  itemCount: number;
-  subtotal: number;
-  shippingFee: number;
-  total: number;
-  freeShippingThreshold: number;
-  baseShippingFee: number;
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
-  openCart: () => void;
-  closeCart: () => void;
-  loading: boolean;
-}
+import {
+  CartContext,
+  type CartItem,
+} from "./CartContextDefinition";
 
 export const BASE_SHIPPING_FEE = 500;
 export const FREE_SHIPPING_THRESHOLD = 8000;
 const GUEST_STORAGE_KEY = "aura_guest_cart_v1";
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -413,14 +390,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </CartContext.Provider>
   );
-};
-
-export const useCart = (): CartContextType => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
 };
 
 export default CartContext;

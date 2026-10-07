@@ -25,15 +25,14 @@ export const VerifyEmailPage: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [resending, setResending] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(60);
-  const [canResend, setCanResend] = useState<boolean>(false);
   const [verifiedSuccess, setVerifiedSuccess] = useState<boolean>(false);
+  const canResend = countdown <= 0;
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Timer countdown for resending verification code
   useEffect(() => {
     if (countdown <= 0) {
-      setCanResend(true);
       return;
     }
 
@@ -145,7 +144,6 @@ export const VerifyEmailPage: React.FC = () => {
       await resendVerification(email.trim());
       toast.success("A fresh verification code has been dispatched to your email.");
       setCountdown(60);
-      setCanResend(false);
       setDigits(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } catch (err: unknown) {

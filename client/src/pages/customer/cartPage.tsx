@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
-import { useCart } from "../../context/CartContext";
-import { useConfirm } from "../../context/ConfirmContext";
+import { useCart } from "../../hooks/useCart";
+import { useConfirm } from "../../hooks/useConfirm";
 import CartItem from "../../components/cart/cartItem";
 import CartSummary from "../../components/cart/cartSummary";
 

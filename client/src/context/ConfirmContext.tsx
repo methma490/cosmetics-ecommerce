@@ -1,27 +1,14 @@
 import React, {
-  createContext,
-  useContext,
   useState,
   useCallback,
   useRef,
 } from "react";
 import { AlertCircle, HelpCircle, LogOut, Trash2, X } from "lucide-react";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
-
-export interface ConfirmOptions {
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmVariant?: "danger" | "primary" | "warning";
-  iconType?: "logout" | "danger" | "warning" | "question";
-}
-
-interface ConfirmContextType {
-  confirm: (options: ConfirmOptions) => Promise<boolean>;
-}
-
-const ConfirmContext = createContext<ConfirmContextType | undefined>(undefined);
+import {
+  ConfirmContext,
+  type ConfirmOptions,
+} from "./ConfirmContextDefinition";
 
 export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -182,14 +169,6 @@ export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({
       )}
     </ConfirmContext.Provider>
   );
-};
-
-export const useConfirm = (): ConfirmContextType => {
-  const context = useContext(ConfirmContext);
-  if (!context) {
-    throw new Error("useConfirm must be used within a ConfirmProvider");
-  }
-  return context;
 };
 
 export default ConfirmProvider;

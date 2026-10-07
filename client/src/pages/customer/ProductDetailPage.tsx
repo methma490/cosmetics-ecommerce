@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import productService from "../../services/productService";
 import type { Product } from "../../types/product";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 import ProductCard from "../../components/product/productCard";

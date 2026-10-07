@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ShoppingBag,
   CreditCard,
@@ -17,7 +17,7 @@ import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
-import { useConfirm } from "../../context/ConfirmContext";
+import { useConfirm } from "../../hooks/useConfirm";
 
 export const OrdersPage: React.FC = () => {
   const { confirm } = useConfirm();
@@ -46,7 +46,7 @@ export const OrdersPage: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [inspectOrder]);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const filters: Record<string, string> = {};
@@ -64,11 +64,14 @@ export const OrdersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [paymentMethodFilter, paymentStatusFilter, statusFilter]);
 
   useEffect(() => {
-    void loadOrders();
-  }, [statusFilter, paymentStatusFilter, paymentMethodFilter]);
+    const timer = setTimeout(() => {
+      void loadOrders();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [loadOrders]);
 
   const handleUpdateOrderStatus = async (
     orderId: string,

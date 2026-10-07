@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import { formatPrice } from "../../utils/formatPrice";
 import { ShieldCheck, Truck, ArrowRight, Sparkles } from "lucide-react";
 

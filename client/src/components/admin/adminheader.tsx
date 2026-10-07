@@ -3,7 +3,7 @@ import { Menu, LogOut, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-import { useConfirm } from "../../context/ConfirmContext";
+import { useConfirm } from "../../hooks/useConfirm";
 import toast from "react-hot-toast";
 
 interface AdminHeaderProps {

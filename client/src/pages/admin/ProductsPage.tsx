@@ -64,7 +64,10 @@ export const ProductsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    void loadData();
+    const timer = setTimeout(() => {
+      void loadData();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleToggleActive = async (product: Product) => {

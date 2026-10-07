@@ -11,7 +11,7 @@ import {
   AlertCircle,
   UserCheck,
 } from "lucide-react";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import { useAuth } from "../../context/AuthContext";
 import orderService from "../../services/orderService";
 import paymentService from "../../services/paymentService";
@@ -44,19 +44,22 @@ export const CheckoutPage: React.FC = () => {
   // Autofill if user profile loads asynchronously
   useEffect(() => {
     if (user?.email) {
-      setFormData((prev) => {
-        if (prev.email && prev.firstName) return prev;
-        return {
-          ...prev,
-          firstName: prev.firstName || user.profile?.firstName || "",
-          lastName: prev.lastName || user.profile?.lastName || "",
-          email: prev.email || user.email || "",
-          phone: prev.phone || user.profile?.phone || "",
-          address: prev.address || user.profile?.address || "",
-          city: prev.city || user.profile?.city || "",
-          postalCode: prev.postalCode || user.profile?.postalCode || "",
-        };
-      });
+      const timer = setTimeout(() => {
+        setFormData((prev) => {
+          if (prev.email && prev.firstName) return prev;
+          return {
+            ...prev,
+            firstName: prev.firstName || user.profile?.firstName || "",
+            lastName: prev.lastName || user.profile?.lastName || "",
+            email: prev.email || user.email || "",
+            phone: prev.phone || user.profile?.phone || "",
+            address: prev.address || user.profile?.address || "",
+            city: prev.city || user.profile?.city || "",
+            postalCode: prev.postalCode || user.profile?.postalCode || "",
+          };
+        });
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [user]);
 

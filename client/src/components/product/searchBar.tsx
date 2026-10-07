@@ -26,9 +26,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Debounced search
   useEffect(() => {
     if (!query.trim()) {
-      setResults([]);
-      setIsOpen(false);
-      return;
+      const timer = setTimeout(() => {
+        setResults([]);
+        setIsOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const timer = setTimeout(async () => {

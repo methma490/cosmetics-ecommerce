@@ -74,7 +74,10 @@ export const ShopPage: React.FC = () => {
   }, [search, category, sort, minPrice, maxPrice, inStock, page]);
 
   useEffect(() => {
-    void fetchProducts();
+    const timer = setTimeout(() => {
+      void fetchProducts();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchProducts]);
 
   // URL State updaters

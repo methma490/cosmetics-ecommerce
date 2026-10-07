@@ -1,5 +1,5 @@
 import api from "./api";
-import type { CartItem } from "../context/CartContext";
+import type { CartItem } from "../context/CartContextDefinition";
 
 export interface CartResponse {
   success: boolean;

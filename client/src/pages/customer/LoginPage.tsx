@@ -120,9 +120,6 @@ export const LoginPage: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gold-metallic" />
 
         <div className="text-center space-y-2">
-          <span className="inline-block text-[10px] tracking-[0.25em] uppercase font-bold text-gold-metallic">
-            Hautes Formulations
-          </span>
           <span className="font-serif-luxury text-2xl tracking-[0.2em] text-[#211A1C] block">
             AURA
           </span>

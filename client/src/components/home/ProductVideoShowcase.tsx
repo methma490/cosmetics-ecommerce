@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Droplets,
 } from "lucide-react";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import type { Product } from "../../types/product";
 
 interface ProductVideoItem {
@@ -137,8 +137,9 @@ export const ProductVideoShowcase: React.FC<ProductVideoShowcaseProps> = ({ real
         v.play().catch(() => {});
       }
     }
-    setProgress(0);
-  }, [selectedIndex]);
+    const timer = setTimeout(() => setProgress(0), 0);
+    return () => clearTimeout(timer);
+  }, [selectedIndex, isPlaying]);
 
   const togglePlay = () => {
     const v = videoRef.current;

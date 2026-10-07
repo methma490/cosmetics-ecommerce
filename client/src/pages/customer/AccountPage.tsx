@@ -14,7 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useConfirm } from "../../context/ConfirmContext";
+import { useConfirm } from "../../hooks/useConfirm";
 import toast from "react-hot-toast";
 import orderService from "../../services/orderService";
 import type { Order } from "../../types/order";

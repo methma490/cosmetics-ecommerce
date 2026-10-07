@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { X, ShoppingBag, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import CartItem from "./cartItem";
 import { formatPrice } from "../../utils/formatPrice";
 import { generateWhatsAppMessage } from "../../utils/generateWhatsAppMessage";

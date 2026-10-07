@@ -16,12 +16,12 @@ import {
   Phone,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import productService from "../../services/productService";
 import type { Product } from "../../types/product";
 import { formatPrice } from "../../utils/formatPrice";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
-import { useConfirm } from "../../context/ConfirmContext";
+import { useConfirm } from "../../hooks/useConfirm";
 import toast from "react-hot-toast";
 
 interface MegaMenuColumn {
@@ -372,10 +372,13 @@ export const Navbar: React.FC = () => {
 
   // Close menus on route change
   useEffect(() => {
-    setActiveMegaMenu(null);
-    setMobileMenuOpen(false);
-    setUserDropdownOpen(false);
-    setSearchOpen(false);
+    const timer = setTimeout(() => {
+      setActiveMegaMenu(null);
+      setMobileMenuOpen(false);
+      setUserDropdownOpen(false);
+      setSearchOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [location.pathname, location.search]);
 
   // Click outside search container
@@ -395,9 +398,11 @@ export const Navbar: React.FC = () => {
   // Debounced search
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setSearchOpen(false);
-      return;
+      const timer = setTimeout(() => {
+        setSearchResults([]);
+        setSearchOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const timer = setTimeout(async () => {

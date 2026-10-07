@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, Check, Sparkles } from "lucide-react";
 import type { Product } from "../../types/product";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import { formatPrice } from "../../utils/formatPrice";
 
 interface ProductCardProps {
