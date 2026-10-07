@@ -41,19 +41,18 @@ export const RegisterPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const res = await register({
+      await register({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
       });
 
-      toast.success("Security code sent! Please verify your email.");
+      toast.success("Security code sent! Please check your email.");
       navigate("/verify-email", {
         state: {
           email: formData.email.trim(),
           firstName: formData.firstName.trim(),
-          devCode: res.devCode,
         },
       });
     } catch (err: unknown) {

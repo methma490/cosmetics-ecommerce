@@ -23,6 +23,7 @@ interface AuthContextType {
   verifyEmail: (email: string, code: string) => Promise<User>;
   resendVerification: (email: string) => Promise<ResendVerificationResponse>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -83,6 +84,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const deleteAccount = async (): Promise<void> => {
+    try {
+      await authService.deleteAccount();
+    } finally {
+      setUser(null);
+    }
+  };
+
   const isAdmin = user?.role === "admin";
 
   return (
@@ -96,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         verifyEmail,
         resendVerification,
         logout,
+        deleteAccount,
         refreshUser,
       }}
     >

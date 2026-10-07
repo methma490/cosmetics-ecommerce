@@ -7,6 +7,7 @@ import {
   register,
   verifyEmail,
   resendVerificationCode,
+  deleteMyAccount,
 } from "../controllers/authController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -45,6 +46,18 @@ router.get(
   "/me",
   protect,
   getMe
+);
+
+router.delete(
+  "/me",
+  protect,
+  deleteMyAccount
+);
+
+router.delete(
+  "/profile",
+  protect,
+  deleteMyAccount
 );
 
 export default router;

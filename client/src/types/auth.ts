@@ -29,7 +29,6 @@ export interface AuthResponse {
   user: User;
   requiresVerification?: boolean;
   email?: string;
-  devCode?: string;
 }
 
 export interface RegisterResponse {
@@ -37,7 +36,6 @@ export interface RegisterResponse {
   message: string;
   requiresVerification?: boolean;
   email?: string;
-  devCode?: string;
 }
 
 export interface VerifyEmailResponse {
@@ -49,7 +47,6 @@ export interface VerifyEmailResponse {
 export interface ResendVerificationResponse {
   success: boolean;
   message: string;
-  devCode?: string;
 }
 
 export interface LoginCredentials {

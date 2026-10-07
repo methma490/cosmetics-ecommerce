@@ -7,7 +7,6 @@ import {
   RefreshCw,
   ArrowLeft,
   CheckCircle2,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
@@ -18,7 +17,7 @@ export const VerifyEmailPage: React.FC = () => {
   const { verifyEmail, resendVerification } = useAuth();
 
   const state = location.state as
-    | { email?: string; firstName?: string; devCode?: string }
+    | { email?: string; firstName?: string }
     | undefined;
 
   const [email, setEmail] = useState<string>(state?.email || "");
@@ -27,7 +26,6 @@ export const VerifyEmailPage: React.FC = () => {
   const [resending, setResending] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(60);
   const [canResend, setCanResend] = useState<boolean>(false);
-  const [devCode, setDevCode] = useState<string | undefined>(state?.devCode);
   const [verifiedSuccess, setVerifiedSuccess] = useState<boolean>(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -139,11 +137,8 @@ export const VerifyEmailPage: React.FC = () => {
 
     try {
       setResending(true);
-      const res = await resendVerification(email.trim());
+      await resendVerification(email.trim());
       toast.success("A fresh verification code has been dispatched to your email.");
-      if (res.devCode) {
-        setDevCode(res.devCode);
-      }
       setCountdown(60);
       setCanResend(false);
       setDigits(["", "", "", "", "", ""]);
@@ -155,13 +150,6 @@ export const VerifyEmailPage: React.FC = () => {
     } finally {
       setResending(false);
     }
-  };
-
-  const handleApplyDevCode = () => {
-    if (!devCode || devCode.length !== 6) return;
-    const split = devCode.split("");
-    setDigits(split);
-    void submitVerification(devCode);
   };
 
   return (
@@ -246,22 +234,7 @@ export const VerifyEmailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Developer/Testing Convenience Pill (Visible if devCode is returned) */}
-            {devCode && (
-              <div className="p-3 bg-[#FFF9F5] rounded-xl border border-amber-300/60 text-center space-y-1">
-                <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-amber-800">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Development Test Code: <strong className="font-mono text-xs">{devCode}</strong></span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleApplyDevCode}
-                  className="text-[11px] text-[#B87D4B] hover:text-[#9E6536] font-semibold underline cursor-pointer"
-                >
-                  Click to Auto-Fill & Verify
-                </button>
-              </div>
-            )}
+
 
             {/* Submit Button */}
             <button

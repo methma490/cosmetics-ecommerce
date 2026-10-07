@@ -40,7 +40,6 @@ export const LoginPage: React.FC = () => {
             requiresVerification?: boolean;
             email?: string;
             message?: string;
-            devCode?: string;
           };
         };
       };
@@ -50,7 +49,6 @@ export const LoginPage: React.FC = () => {
         navigate("/verify-email", {
           state: {
             email: axiosErr.response.data.email || email.trim(),
-            devCode: axiosErr.response.data.devCode,
           },
         });
         return;

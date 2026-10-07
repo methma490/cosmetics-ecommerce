@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useConfirm } from "../../context/ConfirmContext";
@@ -21,12 +22,42 @@ import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 
 export const AccountPage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, deleteAccount } = useAuth();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
+
+  const handleDeleteProfile = async () => {
+    const isConfirmed = await confirm({
+      title: "Delete Profile & Account?",
+      message:
+        "This will permanently delete your profile, addresses, and login credentials from our database. If you wish to shop again in the future, you will have to register afresh. Are you sure?",
+      confirmText: "Delete Permanently",
+      confirmVariant: "danger",
+      iconType: "danger",
+    });
+
+    if (isConfirmed) {
+      try {
+        setDeleting(true);
+        await deleteAccount();
+        toast.success(
+          "Your profile and login credentials have been permanently deleted.",
+          { id: "customer-delete-account" }
+        );
+        navigate("/");
+      } catch (err: unknown) {
+        const msg =
+          err instanceof Error ? err.message : "Unable to delete account.";
+        toast.error(msg);
+      } finally {
+        setDeleting(false);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     const isConfirmed = await confirm({
@@ -166,6 +197,18 @@ export const AccountPage: React.FC = () => {
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
+          {user?.role !== "admin" && (
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={handleDeleteProfile}
+              className="px-5 py-2.5 rounded-full border border-red-200 hover:border-[#B33A3A] text-[#B33A3A] hover:bg-[#B33A3A] hover:text-white text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+              title="Permanently remove your profile and login credentials from database"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>{deleting ? "Deleting..." : "Delete Profile"}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -340,6 +383,31 @@ export const AccountPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Danger Zone: Profile Deletion */}
+      {user?.role !== "admin" && (
+        <div className="bg-[#FFFCFA] rounded-3xl border border-red-100 p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-[#211A1C] flex items-center gap-2">
+                <Trash2 className="w-4 h-4 text-[#B33A3A]" />
+                <span>Delete Profile & Login Credentials</span>
+              </h3>
+              <p className="text-xs text-[#756D70] max-w-xl leading-relaxed">
+                Permanently delete your profile and login credentials from our database. Once deleted, your account is erased and the email address is completely freed up.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={handleDeleteProfile}
+              className="px-5 py-2.5 rounded-full border border-red-200 hover:border-[#B33A3A] text-[#B33A3A] hover:bg-[#B33A3A] hover:text-white text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto disabled:opacity-50"
+            >
+              {deleting ? "Deleting..." : "Delete My Profile"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -19,7 +19,9 @@ api.interceptors.response.use(
       error.message ||
       "An unexpected error occurred. Please try again.";
 
-    return Promise.reject(new Error(message));
+    const customError = new Error(message) as Error & { response?: unknown };
+    customError.response = error.response;
+    return Promise.reject(customError);
   }
 );
 

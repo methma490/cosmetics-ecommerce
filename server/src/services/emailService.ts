@@ -16,13 +16,25 @@ interface SendEmailResult {
 }
 
 const getTransporter = () => {
-  const host = process.env.SMTP_HOST || "smtp.gmail.com";
-  const port = Number(process.env.SMTP_PORT) || 587;
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
 
   if (!user || !pass) {
     return null;
+  }
+
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const isGmail = host.includes("gmail") || user.endsWith("@gmail.com");
+
+  if (isGmail) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user,
+        pass,
+      },
+    });
   }
 
   return nodemailer.createTransport({
@@ -49,23 +61,14 @@ export const sendVerificationCodeEmail = async (
     process.env.SMTP_FROM ||
     `"AURA Haute Beauté" <${process.env.SMTP_USER || "no-reply@auracosmetics.com"}>`;
 
-  // Always log to server console for developer convenience / local testing
-  console.log(
-    `\n👑 [AURA EMAIL SERVICE] ----------------------------------------------------` +
-      `\n   Recipient: ${toEmail} (${firstName})` +
-      `\n   Verification Code (OTP): [ ${code} ]` +
-      `\n   Expires: In 15 minutes` +
-      `\n----------------------------------------------------------------------------\n`
-  );
-
   if (!transporter) {
-    console.warn(
-      `⚠️ [AURA EMAIL SERVICE] SMTP credentials (SMTP_USER / SMTP_PASS) not configured in server/.env. ` +
-        `Code logged to console above for immediate testing.`
+    console.error(
+      `❌ [AURA EMAIL SERVICE] Real SMTP credentials (SMTP_USER / SMTP_PASS) are not yet configured in server/.env.`
     );
     return {
       sent: false,
-      error: "SMTP credentials not configured in server .env",
+      error:
+        "Real email delivery requires SMTP configuration. Please configure SMTP_USER and SMTP_PASS in server/.env.",
     };
   }
 

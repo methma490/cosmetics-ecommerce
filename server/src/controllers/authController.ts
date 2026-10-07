@@ -103,57 +103,30 @@ export const register = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Check email
+    | Check if email is already registered in database
+    |--------------------------------------------------------------------------
+    | Strict check: cannot register if an account with this email already exists
     |--------------------------------------------------------------------------
     */
 
     const existingUser = await User.findOne({
       email: normalizedEmail,
-    }).select("+password");
+    });
+
+    if (existingUser) {
+      res.status(409).json({
+        success: false,
+        message:
+          "An account with this email address already exists. Please sign in or use a different email.",
+      });
+
+      return;
+    }
 
     const hashedPassword = await bcrypt.hash(
       password,
       12
     );
-
-    // If an existing unverified account is found, refresh OTP and allow them to verify
-    if (existingUser) {
-      if (existingUser.isVerified === false) {
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
-
-        existingUser.password = hashedPassword;
-        existingUser.verificationCode = verificationCode;
-        existingUser.verificationCodeExpires = verificationCodeExpires;
-        await existingUser.save();
-
-        await UserProfile.findOneAndUpdate(
-          { user: existingUser._id },
-          { firstName: cleanFirstName, lastName: cleanLastName },
-          { upsert: true }
-        );
-
-        await sendVerificationCodeEmail(normalizedEmail, cleanFirstName, verificationCode);
-
-        res.status(200).json({
-          success: true,
-          requiresVerification: true,
-          email: existingUser.email,
-          message: "An unverified account with this email was found. A fresh 6-digit verification code has been dispatched.",
-          devCode: process.env.NODE_ENV !== "production" ? verificationCode : undefined,
-        });
-
-        return;
-      }
-
-      res.status(409).json({
-        success: false,
-        message:
-          "An account with this email already exists",
-      });
-
-      return;
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -197,11 +170,26 @@ export const register = async (
     |--------------------------------------------------------------------------
     */
 
-    await sendVerificationCodeEmail(
+    const emailResult = await sendVerificationCodeEmail(
       normalizedEmail,
       cleanFirstName,
       verificationCode
     );
+
+    if (!emailResult.sent) {
+      // Clean up newly created unverified account so user is not blocked
+      await User.findByIdAndDelete(user._id);
+      await UserProfile.findOneAndDelete({ user: user._id });
+
+      res.status(500).json({
+        success: false,
+        message:
+          emailResult.error ||
+          "Failed to send verification email. Please check your SMTP configuration in server/.env.",
+      });
+
+      return;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -214,13 +202,19 @@ export const register = async (
       requiresVerification: true,
       email: user.email,
       message:
-        "Account created! Please enter the 6-digit verification code sent to your email to activate your account.",
-      devCode:
-        process.env.NODE_ENV !== "production"
-          ? verificationCode
-          : undefined,
+        "Account created! We have sent a 6-digit verification code to your email inbox.",
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 11000) {
+      res.status(409).json({
+        success: false,
+        message:
+          "An account with this email address already exists. Please sign in or use a different email.",
+      });
+
+      return;
+    }
+
     console.error("Register error:", error);
 
     res.status(500).json({
@@ -342,22 +336,29 @@ export const login = async (
       await user.save();
 
       const profile = await UserProfile.findOne({ user: user._id });
-      await sendVerificationCodeEmail(
+      const emailResult = await sendVerificationCodeEmail(
         user.email,
         profile?.firstName || "Valued Client",
         verificationCode
       );
+
+      if (!emailResult.sent) {
+        res.status(500).json({
+          success: false,
+          message:
+            emailResult.error ||
+            "Unable to deliver verification email. Please check your SMTP configuration in server/.env.",
+        });
+
+        return;
+      }
 
       res.status(403).json({
         success: false,
         requiresVerification: true,
         email: user.email,
         message:
-          "Your email address is not verified yet. We have sent a 6-digit verification code to your inbox.",
-        devCode:
-          process.env.NODE_ENV !== "production"
-            ? verificationCode
-            : undefined,
+          "Your email address is not verified yet. We have sent a 6-digit verification code to your email inbox.",
       });
 
       return;
@@ -712,19 +713,27 @@ export const resendVerificationCode = async (
     user.verificationCodeExpires = verificationCodeExpires;
     await user.save();
 
-    await sendVerificationCodeEmail(
+    const emailResult = await sendVerificationCodeEmail(
       normalizedEmail,
       firstName,
       verificationCode
     );
 
+    if (!emailResult.sent) {
+      res.status(500).json({
+        success: false,
+        message:
+          emailResult.error ||
+          "Unable to deliver verification email. Please check your SMTP credentials in server/.env.",
+      });
+
+      return;
+    }
+
     res.status(200).json({
       success: true,
-      message: "A fresh 6-digit verification code has been dispatched to your email.",
-      devCode:
-        process.env.NODE_ENV !== "production"
-          ? verificationCode
-          : undefined,
+      message:
+        "A fresh 6-digit verification code has been dispatched to your email address.",
     });
   } catch (error) {
     console.error("Resend verification code error:", error);
@@ -732,6 +741,76 @@ export const resendVerificationCode = async (
     res.status(500).json({
       success: false,
       message: "Unable to resend verification code",
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| DELETE USER PROFILE & LOGIN CREDENTIALS
+|--------------------------------------------------------------------------
+| Permanently deletes the user's profile and login credentials from MongoDB.
+| After this deletion, the email is completely freed up and can be re-registered.
+|--------------------------------------------------------------------------
+*/
+
+export const deleteMyAccount = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+
+      return;
+    }
+
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      clearAuthCookie(res);
+      res.status(404).json({
+        success: false,
+        message: "User account not found in database.",
+      });
+
+      return;
+    }
+
+    if (user.role === "admin") {
+      res.status(403).json({
+        success: false,
+        message: "Administrative accounts cannot be self-deleted.",
+      });
+
+      return;
+    }
+
+    // 1. Delete login credentials from database (User model)
+    await User.findByIdAndDelete(userId);
+
+    // 2. Delete user profile from database (UserProfile model)
+    await UserProfile.deleteMany({ user: userId });
+
+    // 3. Clear authentication cookie
+    clearAuthCookie(res);
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Your profile and login credentials have been permanently deleted from the database.",
+    });
+  } catch (error) {
+    console.error("Delete user account error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to delete account",
     });
   }
 };
