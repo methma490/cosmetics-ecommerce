@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Plus,
   Edit,
@@ -267,15 +268,16 @@ export const CategoriesPage: React.FC = () => {
       )}
 
       {/* Add / Edit Modal */}
-      {modalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setModalOpen(false);
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
-        >
+      {modalOpen &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setModalOpen(false);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto"
+          >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-[#E8DADD]/60">
               <h3 className="font-serif-luxury text-lg font-semibold text-[#252223]">
@@ -372,59 +374,62 @@ export const CategoriesPage: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Delete Confirmation Modal */}
-      {deleteCandidate && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setDeleteCandidate(null);
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
-        >
-          <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-sm w-full space-y-4 shadow-xl">
-            <div className="w-12 h-12 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
-              <AlertCircle className="w-6 h-6" />
+      {deleteCandidate &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setDeleteCandidate(null);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto"
+          >
+            <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-sm w-full space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-full bg-[#B33A3A]/10 text-[#B33A3A] flex items-center justify-center mx-auto">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="text-center space-y-1">
+                <h3 className="font-serif-luxury text-lg font-semibold text-[#252223]">
+                  Delete Category?
+                </h3>
+                <p className="text-xs text-[#756D70]">
+                  Are you sure you wish to delete{" "}
+                  <strong className="text-[#252223]">
+                    "{deleteCandidate.name}"
+                  </strong>
+                  ? If products are linked to this category, deletion will be blocked by system safety rules.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteCandidate(null)}
+                  className="flex-1 py-2.5 rounded-full border border-[#E8DADD] text-xs font-semibold text-[#756D70] hover:bg-[#FAF8F3] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="flex-1 py-2.5 rounded-full bg-[#B33A3A] text-white text-xs font-semibold hover:bg-[#8F2B2B] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <span>Delete</span>
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="text-center space-y-1">
-              <h3 className="font-serif-luxury text-lg font-semibold text-[#252223]">
-                Delete Category?
-              </h3>
-              <p className="text-xs text-[#756D70]">
-                Are you sure you wish to delete{" "}
-                <strong className="text-[#252223]">
-                  "{deleteCandidate.name}"
-                </strong>
-                ? If products are linked to this category, deletion will be blocked by system safety rules.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeleteCandidate(null)}
-                className="flex-1 py-2.5 rounded-full border border-[#E8DADD] text-xs font-semibold text-[#756D70] hover:bg-[#FAF8F3]"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                disabled={isDeleting}
-                className="flex-1 py-2.5 rounded-full bg-[#B33A3A] text-white text-xs font-semibold hover:bg-[#8F2B2B] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-              >
-                {isDeleting ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <span>Delete</span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

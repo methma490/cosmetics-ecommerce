@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
+import { useAuth } from "../../context/AuthContext";
 import { formatPrice } from "../../utils/formatPrice";
 import { ShieldCheck, Truck, ArrowRight, Sparkles } from "lucide-react";
 
@@ -15,6 +16,28 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
 }) => {
   const { subtotal, shippingFee, total, items, freeShippingThreshold } =
     useCart();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCheckoutClick = (
+    event: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    onCheckoutClick?.();
+
+    if (authLoading || user) {
+      return;
+    }
+
+    event.preventDefault();
+    navigate("/login", {
+      state: {
+        from: {
+          pathname: "/checkout",
+        },
+        notification: "Please sign in before proceeding to checkout.",
+      },
+    });
+  };
 
   const progressToFreeShipping = Math.min(
     100,
@@ -88,7 +111,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
         <div className="pt-2">
           <Link
             to="/checkout"
-            onClick={onCheckoutClick}
+            onClick={handleCheckoutClick}
             className={`w-full py-4 px-6 rounded-full font-semibold text-xs uppercase tracking-[0.18em] flex items-center justify-center gap-2 transition-all shadow-md ${
               items.length === 0
                 ? "bg-[#F0DFD8] text-[#7D7275] pointer-events-none cursor-not-allowed"

@@ -31,6 +31,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Keep track of the active user to handle transitions cleanly
   const prevUserIdRef = useRef<string | undefined>(userId);
+  const cartSyncingRef = useRef(true);
 
   /*
   |--------------------------------------------------------------------------
@@ -46,6 +47,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     let isCancelled = false;
 
     const syncUserCart = async () => {
+      cartSyncingRef.current = true;
+
       // 1. If customer just logged in or switched
       if (userId) {
         setLoading(true);
@@ -89,6 +92,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
             } catch {
               // Ignore quota
             }
+            cartSyncingRef.current = false;
           }
         } catch (err) {
           console.error("Failed to load customer database cart:", err);
@@ -101,9 +105,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
             } catch {
               setItems([]);
             }
+            cartSyncingRef.current = false;
           }
         } finally {
-          if (!isCancelled) setLoading(false);
+          if (!isCancelled) {
+            setLoading(false);
+            cartSyncingRef.current = false;
+          }
         }
       } else {
         // 2. User is logged out (guest)
@@ -123,6 +131,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
             setItems([]);
           }
         }
+
+        cartSyncingRef.current = false;
       }
 
       prevUserIdRef.current = userId;
@@ -141,6 +151,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   |--------------------------------------------------------------------------
   */
   useEffect(() => {
+    if (cartSyncingRef.current) return;
+
     try {
       if (userId) {
         localStorage.setItem(`aura_cart_${userId}`, JSON.stringify(items));

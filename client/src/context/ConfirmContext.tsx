@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
+import { createPortal } from "react-dom";
 import { AlertCircle, HelpCircle, LogOut, Trash2, X } from "lucide-react";
 import useBodyScrollLock from "../hooks/useBodyScrollLock";
 import {
@@ -118,15 +119,16 @@ export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
 
       {/* Global Luxury Confirmation Modal */}
-      {modalState.isOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) handleClose();
-          }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
-        >
+      {modalState.isOpen &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) handleClose();
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
+          >
           <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-6 sm:p-8 max-w-sm w-full space-y-4 shadow-2xl relative text-center">
             <button
               type="button"
@@ -165,7 +167,8 @@ export const ConfirmProvider: React.FC<{ children: React.ReactNode }> = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </ConfirmContext.Provider>
   );

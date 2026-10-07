@@ -20,22 +20,43 @@ export const generateClientWhatsAppMessage = (
     .map((item, idx) => {
       const name = item.product?.name || item.name || "Formulation";
       const price = item.product?.price ?? item.price ?? 0;
-      return `${idx + 1}. ${name}\n   Qty: ${item.quantity} | ${formatPrice(price)}`;
+
+      return [
+        `${idx + 1}. *${name}*`,
+        `   Qty: ${item.quantity}`,
+        `   Price: ${formatPrice(price)}`,
+      ].join("\n");
     })
     .join("\n\n");
 
   return [
     "*NEW COSMETICS INQUIRY / ORDER*",
     "",
+    "━━━━━━━━━━━━━━━━━━━━",
     "*ITEMS*",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "",
     itemLines,
     "",
-    `Subtotal: ${formatPrice(subtotal)}`,
-    `Shipping: ${shippingFee === 0 ? "Complimentary (FREE)" : formatPrice(shippingFee)}`,
-    `Total: ${formatPrice(total)}`,
+    "━━━━━━━━━━━━━━━━━━━━",
+    "*ORDER SUMMARY*",
+    "━━━━━━━━━━━━━━━━━━━━",
     "",
-    "Hello! I would like to place this order via WhatsApp. Please advise.",
+    `Subtotal: ${formatPrice(subtotal)}`,
+    `Shipping: ${
+      shippingFee === 0
+        ? "Complimentary (FREE)"
+        : formatPrice(shippingFee)
+    }`,
+    "",
+    `*Total: ${formatPrice(total)}*`,
+    "",
+    "━━━━━━━━━━━━━━━━━━━━",
+    "",
+    "Hello! I would like to place this order via WhatsApp.",
+    "Please advise.",
   ].join("\n");
 };
 
-export const generateWhatsAppMessage = generateClientWhatsAppMessage;
+export const generateWhatsAppMessage =
+  generateClientWhatsAppMessage;

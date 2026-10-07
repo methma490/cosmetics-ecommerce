@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ShoppingBag,
   CreditCard,
@@ -405,15 +406,16 @@ export const OrdersPage: React.FC = () => {
       )}
 
       {/* Inspect & Manage Order Modal */}
-      {inspectOrder && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setInspectOrder(null);
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto"
-        >
+      {inspectOrder &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setInspectOrder(null);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto"
+          >
           <div className="bg-white rounded-3xl border border-[#E8DADD] p-6 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-[#E8DADD]/60">
               <div>
@@ -578,11 +580,12 @@ export const OrdersPage: React.FC = () => {
                 onClick={() => setInspectOrder(null)}
                 className="px-6 py-2.5 rounded-full bg-[#252223] text-white text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
               >
-                Close
+                Update
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

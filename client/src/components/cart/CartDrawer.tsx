@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { X, ShoppingBag, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
+import { useAuth } from "../../context/AuthContext";
 import CartItem from "./cartItem";
 import { formatPrice } from "../../utils/formatPrice";
 import { generateWhatsAppMessage } from "../../utils/generateWhatsAppMessage";
@@ -18,6 +19,8 @@ export const CartDrawer: React.FC = () => {
     total,
     freeShippingThreshold,
   } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Lock background scroll when shopping bag drawer is open
   useBodyScrollLock(isCartOpen);
@@ -40,6 +43,19 @@ export const CartDrawer: React.FC = () => {
   const amountRemaining = Math.max(0, freeShippingThreshold - subtotal);
 
   const handleWhatsAppQuickOrder = () => {
+    if (!authLoading && !user) {
+      closeCart();
+      navigate("/login", {
+        state: {
+          from: {
+            pathname: "/cart",
+          },
+          notification: "Please sign in before placing an order.",
+        },
+      });
+      return;
+    }
+
     const formatted = items.map((i) => ({
       name: i.product.name,
       quantity: i.quantity,
@@ -163,7 +179,22 @@ export const CartDrawer: React.FC = () => {
               <div className="pt-2 space-y-2">
                 <Link
                   to="/checkout"
-                  onClick={closeCart}
+                  onClick={(event) => {
+                    if (!authLoading && !user) {
+                      event.preventDefault();
+                      closeCart();
+                      navigate("/login", {
+                        state: {
+                          from: {
+                            pathname: "/checkout",
+                          },
+                          notification: "Please sign in before proceeding to checkout.",
+                        },
+                      });
+                      return;
+                    }
+                    closeCart();
+                  }}
                   className="w-full py-3.5 px-4 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-[0.16em] flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg border border-[#B87D4B]"
                 >
                   <span>Proceed to Secure Checkout</span>

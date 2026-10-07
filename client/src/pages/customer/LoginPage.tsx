@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -18,7 +18,27 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+  const locationState = location.state as
+    | {
+        from?: { pathname: string };
+        notification?: string;
+      }
+    | undefined;
+  const from = locationState?.from?.pathname || "/";
+
+  useEffect(() => {
+    if (!locationState?.notification) {
+      return;
+    }
+
+    toast.error(locationState.notification, {
+      id: "authentication-required",
+    });
+    navigate(location.pathname, {
+      replace: true,
+      state: { from: locationState.from },
+    });
+  }, [location.pathname, locationState, navigate]);
 
   const validateField = (name: string, value: string): string => {
     const val = value.trim();

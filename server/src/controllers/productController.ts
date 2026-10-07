@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import Product from "../models/product.js";
 import Category from "../models/category.js";
+import Cart from "../models/cart.js";
 import createSlug from "../utils/createSlug.js";
 
 /*
@@ -771,8 +772,7 @@ export const updateProduct = async (
       return;
     }
 
-    const product =
-      await Product.findById(id);
+    const product = await Product.findById(id).select("name");
 
     if (!product) {
       res.status(404).json({
@@ -1108,7 +1108,21 @@ export const deleteProduct = async (
       return;
     }
 
-    await product.deleteOne();
+    const [deleteResult] = await Promise.all([
+      Product.deleteOne({ _id: id }),
+      Cart.updateMany(
+        { "items.product": id },
+        { $pull: { items: { product: id } } }
+      ),
+    ]);
+
+    if (deleteResult.deletedCount !== 1) {
+      res.status(500).json({
+        success: false,
+        message: "Product could not be deleted",
+      });
+      return;
+    }
 
     res.status(200).json({
       success: true,
