@@ -34,8 +34,31 @@ export const LoginPage: React.FC = () => {
         navigate(from, { replace: true });
       }
     } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: {
+          data?: {
+            requiresVerification?: boolean;
+            email?: string;
+            message?: string;
+            devCode?: string;
+          };
+        };
+      };
+
+      if (axiosErr.response?.data?.requiresVerification) {
+        toast.error("Please verify your email address to continue.");
+        navigate("/verify-email", {
+          state: {
+            email: axiosErr.response.data.email || email.trim(),
+            devCode: axiosErr.response.data.devCode,
+          },
+        });
+        return;
+      }
+
       toast.error(
-        err instanceof Error ? err.message : "Invalid email or password."
+        axiosErr.response?.data?.message ||
+          (err instanceof Error ? err.message : "Invalid email or password.")
       );
     } finally {
       setSubmitting(false);

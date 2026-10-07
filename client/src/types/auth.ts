@@ -19,6 +19,7 @@ export interface User {
   email: string;
   role: UserRole;
   isActive?: boolean;
+  isVerified?: boolean;
   profile?: UserProfile | null;
 }
 
@@ -26,6 +27,29 @@ export interface AuthResponse {
   success: boolean;
   message?: string;
   user: User;
+  requiresVerification?: boolean;
+  email?: string;
+  devCode?: string;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  requiresVerification?: boolean;
+  email?: string;
+  devCode?: string;
+}
+
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
+export interface ResendVerificationResponse {
+  success: boolean;
+  message: string;
+  devCode?: string;
 }
 
 export interface LoginCredentials {

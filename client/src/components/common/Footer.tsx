@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, ShieldCheck, ArrowRight, Sparkles, Lock } from "lucide-react";
+import { MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 
 export const Footer: React.FC = () => {

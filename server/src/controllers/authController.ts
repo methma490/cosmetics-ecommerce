@@ -11,6 +11,8 @@ import {
   setAuthCookie,
 } from "../utils/authCookie.js";
 
+import { sendVerificationCodeEmail } from "../services/emailService.js";
+
 /*
 |--------------------------------------------------------------------------
 | REGISTER CUSTOMER
@@ -107,9 +109,43 @@ export const register = async (
 
     const existingUser = await User.findOne({
       email: normalizedEmail,
-    });
+    }).select("+password");
 
+    const hashedPassword = await bcrypt.hash(
+      password,
+      12
+    );
+
+    // If an existing unverified account is found, refresh OTP and allow them to verify
     if (existingUser) {
+      if (existingUser.isVerified === false) {
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+        existingUser.password = hashedPassword;
+        existingUser.verificationCode = verificationCode;
+        existingUser.verificationCodeExpires = verificationCodeExpires;
+        await existingUser.save();
+
+        await UserProfile.findOneAndUpdate(
+          { user: existingUser._id },
+          { firstName: cleanFirstName, lastName: cleanLastName },
+          { upsert: true }
+        );
+
+        await sendVerificationCodeEmail(normalizedEmail, cleanFirstName, verificationCode);
+
+        res.status(200).json({
+          success: true,
+          requiresVerification: true,
+          email: existingUser.email,
+          message: "An unverified account with this email was found. A fresh 6-digit verification code has been dispatched.",
+          devCode: process.env.NODE_ENV !== "production" ? verificationCode : undefined,
+        });
+
+        return;
+      }
+
       res.status(409).json({
         success: false,
         message:
@@ -121,93 +157,68 @@ export const register = async (
 
     /*
     |--------------------------------------------------------------------------
-    | Hash password
+    | Create user with verification code
     |--------------------------------------------------------------------------
     */
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      12
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Create users document
-    |--------------------------------------------------------------------------
-    */
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
     const user = await User.create({
       email: normalizedEmail,
       password: hashedPassword,
-
-      // Never accept role from registration body
       role: "customer",
-
       isActive: true,
+      isVerified: false,
+      verificationCode,
+      verificationCodeExpires,
     });
 
     /*
     |--------------------------------------------------------------------------
-    | Create userprofiles document
+    | Create user profile
     |--------------------------------------------------------------------------
     */
 
-    let profile;
-
     try {
-      profile = await UserProfile.create({
+      await UserProfile.create({
         user: user._id,
         firstName: cleanFirstName,
         lastName: cleanLastName,
       });
     } catch (profileError) {
-      // Remove account if profile creation fails.
       await User.findByIdAndDelete(user._id);
-
       throw profileError;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Generate JWT
+    | Send verification email (OTP)
     |--------------------------------------------------------------------------
     */
 
-    const token = generateToken(
-      user._id.toString(),
-      user.role
+    await sendVerificationCodeEmail(
+      normalizedEmail,
+      cleanFirstName,
+      verificationCode
     );
 
     /*
     |--------------------------------------------------------------------------
-    | Store JWT in HttpOnly cookie
-    |--------------------------------------------------------------------------
-    */
-
-    setAuthCookie(res, token);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Response
+    | Response (Requires verification)
     |--------------------------------------------------------------------------
     */
 
     res.status(201).json({
       success: true,
-      message: "Account created successfully",
-
-      user: {
-        id: user._id,
-
-        email: user.email,
-
-        role: user.role,
-
-        profile: {
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-        },
-      },
+      requiresVerification: true,
+      email: user.email,
+      message:
+        "Account created! Please enter the 6-digit verification code sent to your email to activate your account.",
+      devCode:
+        process.env.NODE_ENV !== "production"
+          ? verificationCode
+          : undefined,
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -311,6 +322,42 @@ export const login = async (
       res.status(401).json({
         success: false,
         message: "Invalid email or password",
+      });
+
+      return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Check email verification status
+    |--------------------------------------------------------------------------
+    */
+
+    if (user.role === "customer" && user.isVerified === false) {
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+      user.verificationCode = verificationCode;
+      user.verificationCodeExpires = verificationCodeExpires;
+      await user.save();
+
+      const profile = await UserProfile.findOne({ user: user._id });
+      await sendVerificationCodeEmail(
+        user.email,
+        profile?.firstName || "Valued Client",
+        verificationCode
+      );
+
+      res.status(403).json({
+        success: false,
+        requiresVerification: true,
+        email: user.email,
+        message:
+          "Your email address is not verified yet. We have sent a 6-digit verification code to your inbox.",
+        devCode:
+          process.env.NODE_ENV !== "production"
+            ? verificationCode
+            : undefined,
       });
 
       return;
@@ -482,4 +529,209 @@ export const logout = (
     success: true,
     message: "Logout successful",
   });
+};
+
+/*
+|--------------------------------------------------------------------------
+| VERIFY EMAIL (6-DIGIT OTP)
+|--------------------------------------------------------------------------
+*/
+
+export const verifyEmail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      res.status(400).json({
+        success: false,
+        message: "Email address and 6-digit verification code are required.",
+      });
+
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanCode = code.toString().trim();
+
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+verificationCode +verificationCodeExpires"
+    );
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "Account not found with this email address.",
+      });
+
+      return;
+    }
+
+    if (user.isVerified) {
+      // User is already verified, log them in smoothly
+      const token = generateToken(user._id.toString(), user.role);
+      setAuthCookie(res, token);
+      const profile = await UserProfile.findOne({ user: user._id });
+
+      res.status(200).json({
+        success: true,
+        message: "Your account is already verified.",
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          isVerified: true,
+          profile: profile
+            ? {
+                firstName: profile.firstName,
+                lastName: profile.lastName,
+              }
+            : null,
+        },
+      });
+
+      return;
+    }
+
+    if (!user.verificationCode || user.verificationCode !== cleanCode) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid verification code. Please check your email and try again.",
+      });
+
+      return;
+    }
+
+    if (
+      user.verificationCodeExpires &&
+      user.verificationCodeExpires < new Date()
+    ) {
+      res.status(400).json({
+        success: false,
+        message:
+          "This verification code has expired. Please request a new code.",
+      });
+
+      return;
+    }
+
+    // Activate user account
+    user.isVerified = true;
+    user.verificationCode = undefined;
+    user.verificationCodeExpires = undefined;
+    await user.save();
+
+    // Log the user in with JWT
+    const token = generateToken(user._id.toString(), user.role);
+    setAuthCookie(res, token);
+
+    const profile = await UserProfile.findOne({ user: user._id });
+
+    res.status(200).json({
+      success: true,
+      message: "Account verified successfully! Welcome to AURA Atelier.",
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        isVerified: true,
+        profile: profile
+          ? {
+              firstName: profile.firstName,
+              lastName: profile.lastName,
+            }
+          : null,
+      },
+    });
+  } catch (error) {
+    console.error("Verify email error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to verify email address",
+    });
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| RESEND VERIFICATION CODE (OTP)
+|--------------------------------------------------------------------------
+*/
+
+export const resendVerificationCode = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({
+        success: false,
+        message: "Email address is required.",
+      });
+
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+verificationCode +verificationCodeExpires"
+    );
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "Account not found with this email address.",
+      });
+
+      return;
+    }
+
+    if (user.isVerified) {
+      res.status(400).json({
+        success: false,
+        message: "This account has already been verified. You may sign in.",
+      });
+
+      return;
+    }
+
+    const profile = await UserProfile.findOne({ user: user._id });
+    const firstName = profile?.firstName || "Valued Client";
+
+    // Generate fresh 6-digit OTP
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = verificationCodeExpires;
+    await user.save();
+
+    await sendVerificationCodeEmail(
+      normalizedEmail,
+      firstName,
+      verificationCode
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "A fresh 6-digit verification code has been dispatched to your email.",
+      devCode:
+        process.env.NODE_ENV !== "production"
+          ? verificationCode
+          : undefined,
+    });
+  } catch (error) {
+    console.error("Resend verification code error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to resend verification code",
+    });
+  }
 };

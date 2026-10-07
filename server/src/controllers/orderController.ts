@@ -156,6 +156,7 @@ export const getWhatsAppOrder = async (
 */
 
 const SHIPPING_FEE = 500;
+const FREE_SHIPPING_THRESHOLD = 8000;
 
 /*
 |--------------------------------------------------------------------------
@@ -614,7 +615,7 @@ export const createOrder = async (
     */
 
     const shippingFee =
-      SHIPPING_FEE;
+      subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
 
     const total =
       subtotal +

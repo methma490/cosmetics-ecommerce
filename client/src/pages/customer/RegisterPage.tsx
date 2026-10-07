@@ -41,15 +41,21 @@ export const RegisterPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await register({
+      const res = await register({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
       });
 
-      toast.success("Welcome to AURA! Your account is ready.");
-      navigate("/");
+      toast.success("Security code sent! Please verify your email.");
+      navigate("/verify-email", {
+        state: {
+          email: formData.email.trim(),
+          firstName: formData.firstName.trim(),
+          devCode: res.devCode,
+        },
+      });
     } catch (err: unknown) {
       toast.error(
         err instanceof Error ? err.message : "Unable to register account."

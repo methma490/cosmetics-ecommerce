@@ -23,6 +23,8 @@ interface CartContextType {
   subtotal: number;
   shippingFee: number;
   total: number;
+  freeShippingThreshold: number;
+  baseShippingFee: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   openCart: () => void;
@@ -30,8 +32,8 @@ interface CartContextType {
 }
 
 const CART_STORAGE_KEY = "aura_cosmetics_cart_v1";
-const BASE_SHIPPING_FEE = 500;
-const FREE_SHIPPING_THRESHOLD = 15000;
+export const BASE_SHIPPING_FEE = 500;
+export const FREE_SHIPPING_THRESHOLD = 8000;
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -62,11 +64,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addToCart = (product: Product, quantity = 1): boolean => {
     if (product.stock <= 0) {
-      toast.error("This product is currently out of stock.");
+      toast.error("This product is currently out of stock.", {
+        id: `cart-stock-${product._id}`,
+      });
       return false;
     }
 
-    let success = true;
+    const existingItem = items.find((i) => i.product._id === product._id);
+    const currentQty = existingItem ? existingItem.quantity : 0;
+    const targetQuantity = currentQty + quantity;
+
+    if (targetQuantity > product.stock) {
+      toast.error(
+        existingItem
+          ? `Cannot add more. Only ${product.stock} units available in stock.`
+          : `Only ${product.stock} units available in stock.`,
+        { id: `cart-stock-${product._id}` }
+      );
+      return false;
+    }
 
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex(
@@ -74,51 +90,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (existingIndex > -1) {
-        const existingItem = prevItems[existingIndex];
-        const newQuantity = existingItem.quantity + quantity;
-
-        if (newQuantity > product.stock) {
-          toast.error(
-            `Cannot add more. Only ${product.stock} items available in stock.`
-          );
-          success = false;
-          return prevItems;
-        }
-
         const updated = [...prevItems];
         updated[existingIndex] = {
-          ...existingItem,
-          quantity: newQuantity,
+          ...prevItems[existingIndex],
+          quantity: targetQuantity,
         };
-        toast.success(`Updated "${product.name}" in your bag.`);
         return updated;
-      } else {
-        if (quantity > product.stock) {
-          toast.error(`Only ${product.stock} items available in stock.`);
-          success = false;
-          return prevItems;
-        }
-
-        toast.success(`Added "${product.name}" to your bag.`);
-        return [...prevItems, { product, quantity }];
       }
+
+      return [...prevItems, { product, quantity }];
     });
 
-    if (success) {
-      setIsCartOpen(true);
+    if (existingItem) {
+      toast.success(`Updated "${product.name}" in your bag.`, {
+        id: `cart-add-${product._id}`,
+      });
+    } else {
+      toast.success(`Added "${product.name}" to your bag.`, {
+        id: `cart-add-${product._id}`,
+      });
     }
 
-    return success;
+    setIsCartOpen(true);
+    return true;
   };
 
   const removeFromCart = (productId: string) => {
-    setItems((prev) => {
-      const item = prev.find((i) => i.product._id === productId);
-      if (item) {
-        toast.success(`Removed "${item.product.name}" from bag.`);
-      }
-      return prev.filter((i) => i.product._id !== productId);
-    });
+    const item = items.find((i) => i.product._id === productId);
+    setItems((prev) => prev.filter((i) => i.product._id !== productId));
+    if (item) {
+      toast.success(`Removed "${item.product.name}" from bag.`, {
+        id: `cart-remove-${productId}`,
+      });
+    }
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -127,24 +131,34 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
+    const item = items.find((i) => i.product._id === productId);
+    if (!item) return;
+
+    if (quantity > item.product.stock) {
+      toast.error(
+        `Maximum available stock is ${item.product.stock} units.`,
+        { id: `cart-stock-${productId}` }
+      );
+      setItems((prev) =>
+        prev.map((i) =>
+          i.product._id === productId
+            ? { ...i, quantity: item.product.stock }
+            : i
+        )
+      );
+      return;
+    }
+
     setItems((prev) =>
-      prev.map((item) => {
-        if (item.product._id === productId) {
-          if (quantity > item.product.stock) {
-            toast.error(
-              `Maximum available stock is ${item.product.stock} units.`
-            );
-            return { ...item, quantity: item.product.stock };
-          }
-          return { ...item, quantity };
-        }
-        return item;
-      })
+      prev.map((i) =>
+        i.product._id === productId ? { ...i, quantity } : i
+      )
     );
   };
 
   const clearCart = () => {
     setItems([]);
+    toast.success("Shopping bag cleared.", { id: "cart-clear" });
   };
 
   const itemCount = useMemo(
@@ -187,6 +201,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         subtotal,
         shippingFee,
         total,
+        freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
+        baseShippingFee: BASE_SHIPPING_FEE,
         isCartOpen,
         setIsCartOpen,
         openCart,

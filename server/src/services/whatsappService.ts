@@ -63,7 +63,7 @@ export const generateWhatsAppOrderMessage = (
     "",
     "*ORDER SUMMARY*",
     `Subtotal: ${formatCurrency(order.subtotal)}`,
-    `Shipping: ${formatCurrency(order.shippingFee)}`,
+    `Shipping: ${order.shippingFee === 0 ? "Complimentary (FREE)" : formatCurrency(order.shippingFee)}`,
     `Total: ${formatCurrency(order.total)}`,
     "",
     `Payment Method: WhatsApp Order`,

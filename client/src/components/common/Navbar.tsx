@@ -21,6 +21,8 @@ import productService from "../../services/productService";
 import type { Product } from "../../types/product";
 import { formatPrice } from "../../utils/formatPrice";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import { useConfirm } from "../../context/ConfirmContext";
+import toast from "react-hot-toast";
 
 interface MegaMenuColumn {
   heading: string;
@@ -338,6 +340,7 @@ const MEGA_MENUS: Record<string, MegaMenuConfig> = {
 export const Navbar: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
   const { itemCount, openCart } = useCart();
+  const { confirm } = useConfirm();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -424,9 +427,22 @@ export const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
     setUserDropdownOpen(false);
-    navigate("/");
+
+    const confirmed = await confirm({
+      title: "Sign Out of Atelier?",
+      message: "Are you sure you wish to end your current session?",
+      confirmText: "Sign Out",
+      cancelText: "Stay Signed In",
+      confirmVariant: "danger",
+      iconType: "logout",
+    });
+
+    if (confirmed) {
+      await logout();
+      toast.success("Signed out successfully.", { id: "auth-status" });
+      navigate("/");
+    }
   };
 
   // Mega menu hover management with smooth delay

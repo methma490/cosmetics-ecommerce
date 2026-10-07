@@ -3,6 +3,9 @@ import type {
   AuthResponse,
   LoginCredentials,
   RegisterData,
+  RegisterResponse,
+  VerifyEmailResponse,
+  ResendVerificationResponse,
 } from "../types/auth";
 
 export const authService = {
@@ -11,8 +14,29 @@ export const authService = {
     return response.data;
   },
 
-  register: async (data: RegisterData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/auth/register", data);
+  register: async (data: RegisterData): Promise<RegisterResponse> => {
+    const response = await api.post<RegisterResponse>("/auth/register", data);
+    return response.data;
+  },
+
+  verifyEmail: async (
+    email: string,
+    code: string
+  ): Promise<VerifyEmailResponse> => {
+    const response = await api.post<VerifyEmailResponse>("/auth/verify-email", {
+      email,
+      code,
+    });
+    return response.data;
+  },
+
+  resendVerification: async (
+    email: string
+  ): Promise<ResendVerificationResponse> => {
+    const response = await api.post<ResendVerificationResponse>(
+      "/auth/resend-verification",
+      { email }
+    );
     return response.data;
   },
 

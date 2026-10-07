@@ -17,8 +17,10 @@ import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import { useConfirm } from "../../context/ConfirmContext";
 
 export const OrdersPage: React.FC = () => {
+  const { confirm } = useConfirm();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -119,11 +121,15 @@ export const OrdersPage: React.FC = () => {
   };
 
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to permanently delete order ${orderNumber}?`
-      )
-    ) {
+    const isConfirmed = await confirm({
+      title: `Delete Order ${orderNumber}?`,
+      message: "Are you sure you want to permanently delete this order record? This action cannot be reversed.",
+      confirmText: "Delete Order",
+      confirmVariant: "danger",
+      iconType: "danger",
+    });
+
+    if (!isConfirmed) {
       return;
     }
 

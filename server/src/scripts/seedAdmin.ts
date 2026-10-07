@@ -51,6 +51,7 @@ const seedAdmin = async (): Promise<void> => {
       password: hashedPassword,
       role: "admin",
       isActive: true,
+      isVerified: true,
     });
 
     console.log("Admin created successfully");

@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 
 // Layouts & Utility
 import CustomerLayout from './layouts/CustomerLayout';
@@ -23,6 +24,7 @@ const CartPage = lazy(() => import('./pages/customer/cartPage'));
 const CheckoutPage = lazy(() => import('./pages/customer/CheckoutPage'));
 const LoginPage = lazy(() => import('./pages/customer/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/customer/RegisterPage'));
+const VerifyEmailPage = lazy(() => import('./pages/customer/VerifyEmailPage'));
 const AccountPage = lazy(() => import('./pages/customer/AccountPage'));
 const OrderSuccessPage = lazy(() => import('./pages/customer/OrderSuccessPage'));
 const PaymentStatusPage = lazy(() => import('./pages/customer/PaymentStatusPage'));
@@ -42,12 +44,18 @@ const App: React.FC = () => {
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
-          <NavigationProgressBar />
-          <ScrollToTop />
-          <GlobalScrollLock />
-          <Toaster
-            position="top-right"
-            toastOptions={{
+          <ConfirmProvider>
+            <NavigationProgressBar />
+            <ScrollToTop />
+            <GlobalScrollLock />
+            <Toaster
+              position="top-right"
+              gutter={10}
+              containerStyle={{
+                top: 24,
+                right: 24,
+              }}
+              toastOptions={{
               duration: 3500,
               style: {
                 background: '#FFFCFA',
@@ -91,6 +99,7 @@ const App: React.FC = () => {
                 />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
                 
                 {/* Authenticated Customer Routes */}
                 <Route
@@ -143,6 +152,7 @@ const App: React.FC = () => {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
+          </ConfirmProvider>
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

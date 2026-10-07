@@ -13,14 +13,14 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
   onCheckoutClick,
   showCheckoutBtn = true,
 }) => {
-  const { subtotal, shippingFee, total, items } = useCart();
+  const { subtotal, shippingFee, total, items, freeShippingThreshold } =
+    useCart();
 
-  const FREE_SHIPPING_THRESHOLD = 8000;
   const progressToFreeShipping = Math.min(
     100,
-    Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
+    Math.round((subtotal / freeShippingThreshold) * 100)
   );
-  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
   return (
     <div className="bg-[#FFFCFA] rounded-3xl border border-[#F0DFD8] p-6 sm:p-7 shadow-xs space-y-4">

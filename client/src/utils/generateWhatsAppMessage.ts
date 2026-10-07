@@ -31,7 +31,7 @@ export const generateClientWhatsAppMessage = (
     itemLines,
     "",
     `Subtotal: ${formatPrice(subtotal)}`,
-    `Shipping: ${formatPrice(shippingFee)}`,
+    `Shipping: ${shippingFee === 0 ? "Complimentary (FREE)" : formatPrice(shippingFee)}`,
     `Total: ${formatPrice(total)}`,
     "",
     "Hello! I would like to place this order via WhatsApp. Please advise.",

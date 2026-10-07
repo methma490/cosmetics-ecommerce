@@ -8,8 +8,16 @@ import { generateWhatsAppMessage } from "../../utils/generateWhatsAppMessage";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export const CartDrawer: React.FC = () => {
-  const { isCartOpen, closeCart, items, itemCount, subtotal, shippingFee, total } =
-    useCart();
+  const {
+    isCartOpen,
+    closeCart,
+    items,
+    itemCount,
+    subtotal,
+    shippingFee,
+    total,
+    freeShippingThreshold,
+  } = useCart();
 
   // Lock background scroll when shopping bag drawer is open
   useBodyScrollLock(isCartOpen);
@@ -25,9 +33,11 @@ export const CartDrawer: React.FC = () => {
 
   if (!isCartOpen) return null;
 
-  const FREE_SHIPPING_THRESHOLD = 8000;
-  const progressPercent = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
-  const amountRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const progressPercent = Math.min(
+    100,
+    Math.round((subtotal / freeShippingThreshold) * 100)
+  );
+  const amountRemaining = Math.max(0, freeShippingThreshold - subtotal);
 
   const handleWhatsAppQuickOrder = () => {
     const formatted = items.map((i) => ({
@@ -74,7 +84,7 @@ export const CartDrawer: React.FC = () => {
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-[#211A1C] font-medium flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-[#D4AF37]" />
-                  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
+                  {subtotal >= freeShippingThreshold ? (
                     <span className="text-[#56805D] font-semibold">Complimentary island-wide delivery unlocked!</span>
                   ) : (
                     <span>Add <strong className="text-[#B87D4B]">{formatPrice(amountRemaining)}</strong> for free delivery</span>

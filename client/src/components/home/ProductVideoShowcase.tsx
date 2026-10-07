@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import type { Product } from "../../types/product";
-import toast from "react-hot-toast";
 
 interface ProductVideoItem {
   id: string;
@@ -119,7 +118,7 @@ export const ProductVideoShowcase: React.FC<ProductVideoShowcaseProps> = ({ real
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const { addToCart, openCart } = useCart();
+  const { addToCart } = useCart();
   const currentItem = SHOWCASE_ITEMS[selectedIndex];
 
   // Try to find matching real product from backend for robust add-to-cart
@@ -170,11 +169,7 @@ export const ProductVideoShowcase: React.FC<ProductVideoShowcaseProps> = ({ real
   const handleAddToCart = () => {
     // If we have a matched product from DB, use it
     if (matchedBackendProduct) {
-      const added = addToCart(matchedBackendProduct, 1);
-      if (added) {
-        toast.success(`Added ${matchedBackendProduct.name} to bag`);
-        openCart();
-      }
+      addToCart(matchedBackendProduct, 1);
     } else {
       // Create a compatible product object matching the showcase item
       const fallbackProduct: Product = {
@@ -193,8 +188,6 @@ export const ProductVideoShowcase: React.FC<ProductVideoShowcaseProps> = ({ real
         },
       };
       addToCart(fallbackProduct, 1);
-      toast.success(`Added ${currentItem.title} to bag`);
-      openCart();
     }
   };
 

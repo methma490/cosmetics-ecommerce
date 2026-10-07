@@ -7,6 +7,9 @@ export interface IUser extends Document {
   password: string;
   role: UserRole;
   isActive: boolean;
+  isVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +41,21 @@ const userSchema = new Schema<IUser>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    verificationCode: {
+      type: String,
+      select: false,
+    },
+
+    verificationCodeExpires: {
+      type: Date,
+      select: false,
     },
   },
   {

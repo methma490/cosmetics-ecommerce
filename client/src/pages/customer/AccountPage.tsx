@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Package,
   CreditCard,
@@ -10,18 +10,39 @@ import {
   Truck,
   ChevronDown,
   ChevronUp,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useConfirm } from "../../context/ConfirmContext";
+import toast from "react-hot-toast";
 import orderService from "../../services/orderService";
 import type { Order } from "../../types/order";
 import { formatPrice } from "../../utils/formatPrice";
 import Loader from "../../components/common/Loader";
 
 export const AccountPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { confirm } = useConfirm();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    const isConfirmed = await confirm({
+      title: "Sign Out of Atelier?",
+      message: "Are you sure you wish to end your session at AURA?",
+      confirmText: "Sign Out",
+      confirmVariant: "danger",
+      iconType: "logout",
+    });
+
+    if (isConfirmed) {
+      await logout();
+      toast.success("Signed out successfully.", { id: "customer-logout" });
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
     orderService
@@ -130,12 +151,22 @@ export const AccountPage: React.FC = () => {
           </div>
         </div>
 
-        <Link
-          to="/shop"
-          className="px-6 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs"
-        >
-          Explore Formulations
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/shop"
+            className="px-6 py-2.5 rounded-full bg-[#B87D4B] hover:bg-[#9E6536] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs"
+          >
+            Explore Formulations
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="px-5 py-2.5 rounded-full border border-[#F0DFD8] hover:border-[#B33A3A] text-[#756D70] hover:text-[#B33A3A] hover:bg-[#FDF2F2] text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </div>
 
       {/* Orders Section */}

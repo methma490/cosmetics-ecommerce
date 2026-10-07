@@ -2,11 +2,27 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useConfirm } from "../../context/ConfirmContext";
 import CartItem from "../../components/cart/cartItem";
 import CartSummary from "../../components/cart/cartSummary";
 
 export const CartPage: React.FC = () => {
   const { items, itemCount, clearCart } = useCart();
+  const { confirm } = useConfirm();
+
+  const handleClearBag = async () => {
+    const isConfirmed = await confirm({
+      title: "Clear Shopping Bag?",
+      message: "Are you sure you wish to remove all formulations from your bag? This action cannot be undone.",
+      confirmText: "Clear Bag",
+      confirmVariant: "danger",
+      iconType: "danger",
+    });
+
+    if (isConfirmed) {
+      clearCart();
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -55,8 +71,8 @@ export const CartPage: React.FC = () => {
           </Link>
           <button
             type="button"
-            onClick={clearCart}
-            className="text-xs font-medium text-[#B33A3A] hover:underline flex items-center gap-1 transition-colors"
+            onClick={handleClearBag}
+            className="text-xs font-medium text-[#B33A3A] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
           >
             <Trash2 className="w-3 h-3" />
             <span>Clear Bag</span>

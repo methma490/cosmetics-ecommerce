@@ -3,6 +3,9 @@ import { Menu, LogOut, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+import { useConfirm } from "../../context/ConfirmContext";
+import toast from "react-hot-toast";
+
 interface AdminHeaderProps {
   onToggleSidebar: () => void;
   title?: string;
@@ -14,10 +17,22 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    const isConfirmed = await confirm({
+      title: "Sign Out of Admin Atelier?",
+      message: "Are you sure you want to end your administrative session?",
+      confirmText: "Sign Out",
+      confirmVariant: "danger",
+      iconType: "logout",
+    });
+
+    if (isConfirmed) {
+      await logout();
+      toast.success("Administrator session closed.", { id: "admin-logout" });
+      navigate("/login");
+    }
   };
 
   return (

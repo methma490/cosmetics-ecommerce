@@ -10,6 +10,8 @@ import type {
   User,
   LoginCredentials,
   RegisterData,
+  RegisterResponse,
+  ResendVerificationResponse,
 } from "../types/auth";
 
 interface AuthContextType {
@@ -17,7 +19,9 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   login: (credentials: LoginCredentials) => Promise<User>;
-  register: (data: RegisterData) => Promise<User>;
+  register: (data: RegisterData) => Promise<RegisterResponse>;
+  verifyEmail: (email: string, code: string) => Promise<User>;
+  resendVerification: (email: string) => Promise<ResendVerificationResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -55,10 +59,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return data.user;
   };
 
-  const register = async (data: RegisterData): Promise<User> => {
-    const response = await authService.register(data);
+  const register = async (data: RegisterData): Promise<RegisterResponse> => {
+    return await authService.register(data);
+  };
+
+  const verifyEmail = async (email: string, code: string): Promise<User> => {
+    const response = await authService.verifyEmail(email, code);
     setUser(response.user);
     return response.user;
+  };
+
+  const resendVerification = async (
+    email: string
+  ): Promise<ResendVerificationResponse> => {
+    return await authService.resendVerification(email);
   };
 
   const logout = async (): Promise<void> => {
@@ -79,6 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAdmin,
         login,
         register,
+        verifyEmail,
+        resendVerification,
         logout,
         refreshUser,
       }}
