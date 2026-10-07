@@ -12,6 +12,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -137,6 +138,12 @@ app.use(
 app.use(
   "/api/payments",
   paymentRoutes
+);
+
+// File / Image Uploads (Cloudinary)
+app.use(
+  "/api/upload",
+  uploadRoutes
 );
 
 /**
