@@ -30,6 +30,7 @@ export const register = async (
       lastName,
       email,
       password,
+      confirmPassword,
     } = req.body;
 
     /*
@@ -42,12 +43,13 @@ export const register = async (
       !firstName ||
       !lastName ||
       !email ||
-      !password
+      !password ||
+      !confirmPassword
     ) {
       res.status(400).json({
         success: false,
         message:
-          "First name, last name, email and password are required",
+          "First name, last name, email, password and confirmation password are required",
       });
 
       return;
@@ -63,7 +65,8 @@ export const register = async (
       typeof firstName !== "string" ||
       typeof lastName !== "string" ||
       typeof email !== "string" ||
-      typeof password !== "string"
+      typeof password !== "string" ||
+      typeof confirmPassword !== "string"
     ) {
       res.status(400).json({
         success: false,
@@ -97,6 +100,15 @@ export const register = async (
         success: false,
         message:
           "Password must be at least 8 characters",
+      });
+
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Passwords do not match",
       });
 
       return;

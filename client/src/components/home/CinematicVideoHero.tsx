@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Sparkles,
   ChevronDown,
   Play,
   Pause,
+  ArrowRight,
+  Eye,
+  CheckCircle2,
 } from "lucide-react";
 
 interface HeroScene {
@@ -167,7 +171,7 @@ export const CinematicVideoHero: React.FC = () => {
         .aura-reveal{opacity:0;animation:auraFadeUp 1s cubic-bezier(.22,1,.36,1) forwards;animation-delay:var(--d,0s)}
         .aura-mask{display:block;overflow:hidden;padding-bottom:.08em}
         .aura-mask>span{display:block;transform:translateY(110%);animation:auraLineUp 1.1s cubic-bezier(.22,1,.36,1) forwards;animation-delay:var(--d,0s)}
-        .aura-rule{transform-origin:center;transform:scaleX(0);animation:auraGrow 1.3s cubic-bezier(.22,1,.36,1) forwards;animation-delay:var(--d,0s)}
+        .aura-rule{transform-origin:left;transform:scaleX(0);animation:auraGrow 1.3s cubic-bezier(.22,1,.36,1) forwards;animation-delay:var(--d,0s)}
         .aura-gold{background:linear-gradient(100deg,#C59B27 0%,#FFF4BD 25%,#E5C158 50%,#FFF4BD 75%,#C59B27 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:auraShimmer 6s linear infinite}
         .aura-fadein{opacity:0;animation:auraIn 1.3s ease-out forwards;animation-delay:var(--d,0s)}
 
@@ -201,7 +205,7 @@ export const CinematicVideoHero: React.FC = () => {
             disablePictureInPicture
             onLoadedData={() => setVideoReady(true)}
             onError={handleVideoError}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+            className={`absolute inset-0 w-full h-full object-cover object-center lg:object-[60%_center] transition-opacity duration-1000 ${
               videoReady ? "opacity-90" : "opacity-0"
             }`}
           >
@@ -210,10 +214,10 @@ export const CinematicVideoHero: React.FC = () => {
           </video>
         )}
 
-        {/* Balanced Cinematic Overlays - calibrated so product remains luminous and visible */}
+        {/* Balanced Cinematic Overlays - calibrated so left text is legible while product remains luminous and visible */}
         <div className="absolute inset-0 bg-radial from-[#140e11]/20 via-[#140e11]/60 to-[#140e11]/85 pointer-events-none" />
         <div className="absolute inset-0 bg-linear-to-t from-[#140e11] via-transparent to-[#140e11]/65 pointer-events-none" />
-        <div className="absolute inset-0 bg-linear-to-r from-[#140e11]/70 via-transparent to-[#140e11]/45 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#140e11]/95 via-[#140e11]/65 lg:via-[#140e11]/30 to-transparent pointer-events-none" />
 
         {/* Fade into page bottom */}
         <div className="absolute bottom-0 inset-x-0 h-32 bg-linear-to-b from-transparent to-brand-bg pointer-events-none" />
@@ -236,9 +240,9 @@ export const CinematicVideoHero: React.FC = () => {
       </div>
 
       {/* ===== HERO CONTENT CONTAINER ===== */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-16 sm:pb-20 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 lg:pt-10 pb-16 sm:pb-20 w-full">
         {/* Interactive Scene Switcher Pills */}
-        <div className="aura-reveal flex justify-center mb-5 sm:mb-6" style={{ ["--d" as string]: "0.15s" }}>
+        <div className="aura-reveal flex justify-center mb-6 sm:mb-8" style={{ ["--d" as string]: "0.15s" }}>
           <div className="inline-flex p-1 rounded-full bg-[#1e1518]/80 border border-brand-gold/40 backdrop-blur-md shadow-xl gap-1 max-w-full overflow-x-auto">
             {HERO_SCENES.map((scene, idx) => {
               const isActive = idx === activeSceneIndex;
@@ -260,45 +264,151 @@ export const CinematicVideoHero: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Headline Presentation (Centered & Distraction-Free) */}
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div
-            className="aura-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1e1518]/70 border border-brand-gold/60 text-brand-gold-bright text-[11px] uppercase tracking-[0.22em] font-semibold backdrop-blur-md"
-            style={{ ["--d" as string]: "0.3s" }}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-            <span>{activeScene.ritualName}</span>
-          </div>
-
-          <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-normal text-brand-surface leading-[1.04] tracking-tight">
-            <span className="aura-mask">
-              <span style={{ ["--d" as string]: "0.45s" }}>BEAUTY,</span>
-            </span>
-            <span className="aura-mask">
-              <span style={{ ["--d" as string]: "0.65s" }} className="italic font-light">
-                <span className="aura-gold">ELEVATED.</span>
-              </span>
-            </span>
-          </h1>
-
-          <div className="flex justify-center">
+        {/* Main Grid: Headline on left, Product In Video Card on right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column: Typography & CTAs */}
+          <div className="lg:col-span-7 text-left space-y-6">
             <div
-              className="aura-rule h-px w-28 bg-linear-to-r from-transparent via-brand-gold to-transparent"
-              style={{ ["--d" as string]: "0.9s" }}
-            />
+              className="aura-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1e1518]/70 border border-brand-gold/60 text-brand-gold-bright text-[11px] uppercase tracking-[0.22em] font-semibold backdrop-blur-md"
+              style={{ ["--d" as string]: "0.3s" }}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+              <span>{activeScene.ritualName}</span>
+            </div>
+
+            <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-normal text-brand-surface leading-[1.04] tracking-tight">
+              <span className="aura-mask">
+                <span style={{ ["--d" as string]: "0.45s" }}>BEAUTY,</span>
+              </span>
+              <span className="aura-mask">
+                <span style={{ ["--d" as string]: "0.65s" }} className="italic font-light">
+                  <span className="aura-gold">ELEVATED.</span>
+                </span>
+              </span>
+            </h1>
+
+            <div className="flex justify-start">
+              <div
+                className="aura-rule h-px w-28 bg-linear-to-r from-brand-gold via-brand-gold/60 to-transparent"
+                style={{ ["--d" as string]: "0.9s" }}
+              />
+            </div>
+
+            <p
+              className="aura-reveal text-sm sm:text-base md:text-lg text-[#F7EFE9] max-w-xl font-light leading-relaxed tracking-wide"
+              style={{ ["--d" as string]: "1s" }}
+            >
+              Experience the visual purity of our botanical formulations. Every droplet and crystal flacon is crafted with pure active ingredients for extraordinary daily radiance.
+            </p>
+
+            <div
+              className="aura-reveal flex flex-col sm:flex-row items-center justify-start gap-4 pt-2"
+              style={{ ["--d" as string]: "1.2s" }}
+            >
+              <Link
+                to={`/shop?category=${activeScene.categorySlug}`}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#B87D4B] hover:bg-brand-primary-hover text-white text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 shadow-xl hover:shadow-[0_10px_35px_-8px_rgba(184,125,75,0.7)] hover:-translate-y-0.5 flex items-center justify-center gap-2 group border border-brand-gold/50"
+              >
+                <span>Shop Featured Product</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                to="/shop"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-brand-surface border border-brand-gold/50 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-md transition-all duration-300 text-center hover:border-brand-gold-bright hover:-translate-y-0.5"
+              >
+                Browse All Formulations
+              </Link>
+            </div>
           </div>
 
-          <p
-            className="aura-reveal text-sm sm:text-base md:text-lg text-[#F7EFE9] max-w-2xl mx-auto font-light leading-relaxed tracking-wide"
-            style={{ ["--d" as string]: "1s" }}
-          >
-            Experience the visual purity of our botanical formulations. Every droplet and crystal flacon is crafted with pure active ingredients for extraordinary daily radiance.
-          </p>
+          {/* Right Column: FLOATING "PRODUCT IN VIDEO" SPOTLIGHT CARD */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div
+              className="aura-reveal w-full max-w-sm rounded-3xl bg-[#1e1518]/85 border border-brand-gold/50 p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden group hover:border-brand-gold-bright/80 transition-all duration-500"
+              style={{ ["--d" as string]: "0.8s" }}
+            >
+              {/* Subtle gold sheen */}
+              <div className="absolute -top-16 -right-16 w-36 h-36 bg-brand-gold/15 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Header Badge */}
+              <div className="flex items-center justify-between gap-2 pb-3.5 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-brand-gold animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-brand-gold-bright font-bold">
+                    Product In Video
+                  </span>
+                </div>
+                <span className="text-[10px] text-[#F7EFE9]/70 font-medium">
+                  {activeScene.categoryLabel}
+                </span>
+              </div>
+
+              {/* Product Mini Showcase */}
+              <div className="flex gap-4 pt-4 items-center">
+                <div className="w-20 h-24 rounded-2xl overflow-hidden bg-black/40 border border-brand-gold/40 shrink-0 relative">
+                  <img
+                    src={activeScene.productImage}
+                    alt={activeScene.productName}
+                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/images/placeholders/product-placeholder.jpg";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-1 right-1 p-1 rounded-full bg-black/60 text-brand-gold-bright">
+                    <Eye className="w-2.5 h-2.5" />
+                  </div>
+                </div>
+
+                <div className="space-y-1 min-w-0">
+                  <h3 className="font-serif-luxury text-base sm:text-lg font-medium text-brand-surface leading-tight line-clamp-2">
+                    {activeScene.productName}
+                  </h3>
+                  <p className="text-[11px] text-[#F7EFE9]/80 font-light line-clamp-2 leading-relaxed">
+                    {activeScene.productTagline}
+                  </p>
+                  <div className="pt-1 flex items-baseline gap-2">
+                    <span className="text-sm font-semibold text-brand-gold-bright tracking-wide">
+                      {activeScene.priceFormatted}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-wider text-brand-success font-medium bg-brand-success/15 px-1.5 py-0.5 rounded">
+                      In Stock
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Active Botanical Key Highlights */}
+              <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap gap-1.5">
+                {activeScene.keyActives.map((active, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#F7EFE9]"
+                  >
+                    <CheckCircle2 className="w-2.5 h-2.5 text-brand-gold" />
+                    <span>{active}</span>
+                  </span>
+                ))}
+              </div>
+
+              {/* Action Button */}
+              <div className="mt-4 pt-2">
+                <Link
+                  to={`/shop?category=${activeScene.categorySlug}`}
+                  className="w-full py-2.5 px-4 rounded-xl bg-linear-to-r from-[#B87D4B] to-brand-primary-hover hover:brightness-110 text-white text-xs font-semibold uppercase tracking-[0.16em] transition-all flex items-center justify-center gap-2 shadow-md border border-brand-gold/40"
+                >
+                  <span>Explore in Boutique</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 4 Pillars of Excellence */}
         <div
-          className="aura-reveal mt-8 sm:mt-10 pt-6 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center border-t border-white/10"
+          className="aura-reveal mt-10 sm:mt-12 pt-6 sm:pt-8 grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto text-left border-t border-white/10"
           style={{ ["--d" as string]: "1.4s" }}
         >
           {HIGHLIGHTS.map((h) => (

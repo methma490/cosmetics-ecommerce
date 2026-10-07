@@ -146,6 +146,7 @@ export const RegisterPage: React.FC = () => {
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
 
       toast.success("Security code sent! Please check your email inbox.");
