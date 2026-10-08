@@ -44,7 +44,7 @@ const HERO_SCENES: HeroScene[] = [
   },
   {
     id: "crystal-fragrance",
-    tabLabel: "Crystal Parfum",
+    tabLabel: "Crystal Perfum",
     ritualName: "02 • Couture Amber Fragrance",
     productName: "Maison Fleur Eau De Parfum",
     productTagline: "Faceted crystal flacon with French peony, bergamot & warm musk",
