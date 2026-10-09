@@ -309,7 +309,7 @@ export const HomePage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-brand-bg border border-brand-gold/40 text-brand-gold-deep flex items-center justify-center mx-auto">
               <Truck className="w-6 h-6" />
             </div>
-            <h4 className="font-serif-luxury text-base font-semibold text-[#211A1C]">
+            <h4 className="foFnt-serif-luxury text-base font-semibold text-[#211A1C]">
               Island-wide Express Care
             </h4>
             <p className="text-xs text-brand-text-muted leading-relaxed font-light">

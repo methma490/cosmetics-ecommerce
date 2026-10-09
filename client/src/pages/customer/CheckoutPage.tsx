@@ -135,6 +135,37 @@ export const CheckoutPage: React.FC = () => {
     );
   }
 
+  // If user is not authenticated, redirect to login
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-24 text-center space-y-6 bg-[#FFF9F5]">
+        <div className="w-16 h-16 rounded-full bg-[#F7EFE9] text-[#B87D4B] flex items-center justify-center mx-auto">
+          <UserCheck className="w-8 h-8" />
+        </div>
+        <h2 className="font-serif-luxury text-2xl text-[#211A1C]">
+          Sign In to Complete Your Purchase
+        </h2>
+        <p className="text-xs text-[#7D7275] max-w-md mx-auto">
+          Please sign in to your account or create a new account to proceed with checkout and track your orders.
+        </p>
+        <div className="flex items-center justify-center gap-4">
+          <Link
+            to="/login"
+            className="inline-block px-8 py-3 rounded-full bg-[#B87D4B] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#9E6536] transition-colors border border-[#D4AF37]/40"
+          >
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            className="inline-block px-8 py-3 rounded-full bg-white text-[#211A1C] text-xs font-semibold uppercase tracking-wider hover:bg-[#F7EFE9] transition-colors border border-[#D4AF37]/40"
+          >
+            Create Account
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
